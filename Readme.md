@@ -114,5 +114,6 @@ SOLID is an acronym for five fundamental principles of object-oriented programmi
 ## Resources
 
 - Design Patterns with [Refactoring Guru](https://refactoring.guru)
+- LLD and Concurrency Solution (80+ blogs) [LLDcoding](https://lldcoding.com/)
 
 > NOTE: This repository was created during my learning journey in Low-Level Design. If you notice any improvements or corrections, feel free to reach out.
