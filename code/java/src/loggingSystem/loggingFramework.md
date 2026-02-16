@@ -52,3 +52,58 @@ Formatter
     ↓
 Output (Console / File)
 ```
+
+## How Level Filtering works?
+
+- Prevent lower-severity logs from being processed.
+- Example: ```rootLogger.setLogLevel(LogLevel.INFO);```
+- Ignored
+    ```pgsql
+    DEBUG → ignored
+    INFO  → allowed
+    WARN  → allowed
+    ERROR → allowed
+    ```
+  
+- Flow
+  - Determine Effective Level
+  - If current logger has level → use it 
+  - Else → check parent
+  - Else → check parent’s parent 
+  - Eventually → root 
+  - If nothing set → default DEBUG
+- Example
+  ```pgsql
+  root (INFO)
+  └── com.example.db (DEBUG)
+  └── com.example.db.connection (null)
+  ```
+  - if ```connectionLogger.debug("msg");```
+  - Effective level resolution:
+    - connection → null 
+    - parent db → DEBUG 
+    - so effective level = DEBUG
+
+
+## How Hierarchy Propagation works?
+
+- Allow child loggers to inherit appenders from parent loggers.
+- When ```serviceLogger.info("Service starting");```
+- Hierarchy:
+  ```pgsql
+    root (ConsoleAppender)
+    └── com
+    └── example
+    └── service (FileAppender)
+    ```
+  
+- Execution Flow
+  - service logger processes message 
+  - If service has appenders → send to them
+  - Move to parent 
+  - Parent has appenders → send to them
+  - Continue until root
+
+- So:
+  - FileAppender handles it
+  - ConsoleAppender handles it
