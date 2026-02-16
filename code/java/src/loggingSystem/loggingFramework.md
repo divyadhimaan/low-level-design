@@ -28,6 +28,116 @@
 | **Producer–Consumer (Concurrency Pattern)** | `AsyncLogProcessor`                               | Decouples log generation from log writing              | Prevents blocking main thread and ensures ordered asynchronous execution      |
 | **Factory-like Creation**                   | `LoggingManager.getLogger()`                      | Encapsulates logger creation logic                     | Controls logger hierarchy construction and avoids external instantiation      |
 
+## UML
+
+```mermaid
+classDiagram
+
+%% ========================
+%% Core Models
+%% ========================
+
+class LogLevel {
+    <<enum>>
+    - int level
+    + isGreaterOrEqual(LogLevel other) boolean
+}
+
+class LogMessage {
+    - LogLevel logLevel
+    - String message
+    - String loggerName
+    - LocalDateTime timestamp
+}
+
+%% ========================
+%% Orchestrator Layer
+%% ========================
+
+class LoggingManager {
+    - static LoggingManager instance
+    - Map~String, Logger~ loggers
+    - Logger rootLogger
+    - AsyncLogProcessor processor
+    + getInstance() LoggingManager
+    + getLogger(String name) Logger
+    + shutdown()
+}
+
+class Logger {
+    - String name
+    - LogLevel logLevel
+    - Logger parent
+    - List~LogAppender~ appenderList
+    + addAppender(LogAppender)
+    + log(LogLevel, String)
+    + debug(String)
+    + info(String)
+    + warn(String)
+    + error(String)
+    + getEffectiveLevel() LogLevel
+}
+
+class AsyncLogProcessor {
+    - ExecutorService executor
+    + process(LogMessage, List~LogAppender~)
+    + stop()
+}
+
+%% ========================
+%% Strategy - Appender
+%% ========================
+
+class LogAppender {
+    <<interface>>
+    + append(LogMessage)
+    + close()
+}
+
+class ConsoleAppender {
+    - LogFormatter logFormatter
+    + append(LogMessage)
+}
+
+class FileAppender {
+    - LogFormatter logFormatter
+    - FileWriter fileWriter
+    + append(LogMessage)
+    + close()
+}
+
+%% ========================
+%% Strategy - Formatter
+%% ========================
+
+class LogFormatter {
+    <<interface>>
+    + format(LogMessage) String
+}
+
+class TextFormatter {
+    + format(LogMessage) String
+}
+
+%% ========================
+%% Relationships
+%% ========================
+
+LoggingManager --> Logger : manages
+LoggingManager --> AsyncLogProcessor : owns
+Logger --> Logger : parent
+Logger --> LogAppender : uses
+Logger --> LogMessage : creates
+AsyncLogProcessor --> LogAppender : dispatches to
+ConsoleAppender ..|> LogAppender
+FileAppender ..|> LogAppender
+ConsoleAppender --> LogFormatter
+FileAppender --> LogFormatter
+TextFormatter ..|> LogFormatter
+LogMessage --> LogLevel
+
+```
+
 
 ## Architecture
 
