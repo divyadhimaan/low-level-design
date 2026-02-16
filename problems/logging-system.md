@@ -8,3 +8,6 @@
 - It should provide a configuration mechanism to set the log level and output destination.
 - The logging framework should be thread-safe to handle concurrent logging from multiple threads.
 - It should be extensible to accommodate new log levels and output destinations in the future.
+
+
+[Java Implementation](./../code/java/src/loggingSystem/LoggingDemo.java)
