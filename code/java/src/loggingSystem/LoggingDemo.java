@@ -1,11 +1,11 @@
 package loggingSystem;
 
-import loggingSystem.model.LogLevel;
-import loggingSystem.orchestrator.Logger;
-import loggingSystem.orchestrator.LoggingManager;
-import loggingSystem.strategy.appender.ConsoleAppender;
-import loggingSystem.strategy.appender.FileAppender;
-import loggingSystem.strategy.formatter.TextFormatter;
+import loggingSystem.core.model.LogLevel;
+import loggingSystem.core.Logger;
+import loggingSystem.core.LoggingManager;
+import loggingSystem.core.strategy.appender.ConsoleAppender;
+import loggingSystem.core.strategy.appender.FileAppender;
+import loggingSystem.core.strategy.formatter.TextFormatter;
 
 public class LoggingDemo {
     public static void main(String[] args){

@@ -1,6 +1,6 @@
-package loggingSystem.orchestrator;
+package loggingSystem.core;
 
-import loggingSystem.strategy.appender.LogAppender;
+import loggingSystem.core.strategy.appender.LogAppender;
 import lombok.Getter;
 
 import java.util.Map;

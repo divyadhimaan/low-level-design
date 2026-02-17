@@ -1,8 +1,8 @@
-package loggingSystem.orchestrator;
+package loggingSystem.core;
 
-import loggingSystem.model.LogLevel;
-import loggingSystem.model.LogMessage;
-import loggingSystem.strategy.appender.LogAppender;
+import loggingSystem.core.model.LogLevel;
+import loggingSystem.core.model.LogMessage;
+import loggingSystem.core.strategy.appender.LogAppender;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -39,7 +39,12 @@ public class Logger {
 
     public void log(LogLevel logLevel, String message){
         if(logLevel.isGreaterOrEqual(getEffectiveLevel())) {
-            LogMessage logMessage = new LogMessage(logLevel, this.name, message);
+            LogMessage logMessage = new LogMessage.Builder()
+                    .logLevel(logLevel)
+                    .message(message)
+                    .logger(this.name)
+                    .build();
+            
             callAppender(logMessage);
         }
     }

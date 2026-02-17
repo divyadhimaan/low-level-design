@@ -1,6 +1,6 @@
-package loggingSystem.strategy.formatter;
+package loggingSystem.core.strategy.formatter;
 
-import loggingSystem.model.LogMessage;
+import loggingSystem.core.model.LogMessage;
 
 import java.time.format.DateTimeFormatter;
 

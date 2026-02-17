@@ -1,7 +1,7 @@
-package loggingSystem.strategy.appender;
+package loggingSystem.core.strategy.appender;
 
-import loggingSystem.model.LogMessage;
-import loggingSystem.strategy.formatter.LogFormatter;
+import loggingSystem.core.model.LogMessage;
+import loggingSystem.core.strategy.formatter.LogFormatter;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +13,7 @@ public class FileAppender implements LogAppender{
     @Getter
     @Setter
     private LogFormatter logFormatter;
-    private FileWriter fileWriter;
+    private final FileWriter fileWriter;
 
     public FileAppender(LogFormatter formatter, String filePath){
         this.logFormatter = formatter;

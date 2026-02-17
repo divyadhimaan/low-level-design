@@ -1,7 +1,7 @@
-package loggingSystem.orchestrator;
+package loggingSystem.core;
 
-import loggingSystem.model.LogMessage;
-import loggingSystem.strategy.appender.LogAppender;
+import loggingSystem.core.model.LogMessage;
+import loggingSystem.core.strategy.appender.LogAppender;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

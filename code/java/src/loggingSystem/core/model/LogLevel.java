@@ -1,4 +1,4 @@
-package loggingSystem.model;
+package loggingSystem.core.model;
 
 public enum LogLevel {
     DEBUG(1), INFO(2), WARN(3), ERROR(4);

@@ -19,14 +19,15 @@
 
 ## Design Patterns
 
-| Design Pattern                              | Applied In                                        | Purpose                                                | Why It Fits Here                                                              |
-|---------------------------------------------|---------------------------------------------------|--------------------------------------------------------|-------------------------------------------------------------------------------|
-| **Singleton**                               | `LoggingManager`                                  | Ensures a single global logging configuration instance | Logging system should have centralized configuration and lifecycle control    |
-| **Strategy**                                | `LogAppender` (`ConsoleAppender`, `FileAppender`) | Allows interchangeable output destinations             | Enables adding new appenders (DB, Kafka, Remote API) without modifying Logger |
-| **Strategy**                                | `LogFormatter` (`TextFormatter`)                  | Allows interchangeable formatting logic                | Supports multiple output formats (Text, JSON, XML) without changing appenders |
-| **Composite-like (Hierarchy Pattern)**      | `Logger` with parent reference                    | Enables hierarchical logger structure                  | Child loggers inherit level and propagate logs to parents (like Log4j)        |
-| **Producer–Consumer (Concurrency Pattern)** | `AsyncLogProcessor`                               | Decouples log generation from log writing              | Prevents blocking main thread and ensures ordered asynchronous execution      |
-| **Factory-like Creation**                   | `LoggingManager.getLogger()`                      | Encapsulates logger creation logic                     | Controls logger hierarchy construction and avoids external instantiation      |
+| Design Pattern                              | Applied In                                        | Purpose                                                | Why It Fits Here                                                                                       |
+|---------------------------------------------|---------------------------------------------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------|
+| **Singleton**                               | `LoggingManager`                                  | Ensures a single global logging configuration instance | Logging system should have centralized configuration and lifecycle control                             |
+| **Strategy**                                | `LogAppender` (`ConsoleAppender`, `FileAppender`) | Allows interchangeable output destinations             | Enables adding new appenders (DB, Kafka, Remote API) without modifying Logger                          |
+| **Strategy**                                | `LogFormatter` (`TextFormatter`)                  | Allows interchangeable formatting logic                | Supports multiple output formats (Text, JSON, XML) without changing appenders                          |
+| **Composite-like (Hierarchy Pattern)**      | `Logger` with parent reference                    | Enables hierarchical logger structure                  | Child loggers inherit level and propagate logs to parents (like Log4j)                                 |
+| **Producer–Consumer (Concurrency Pattern)** | `AsyncLogProcessor`                               | Decouples log generation from log writing              | Prevents blocking main thread and ensures ordered asynchronous execution                               |
+| **Factory-like Creation**                   | `LoggingManager.getLogger()`                      | Encapsulates logger creation logic                     | Controls logger hierarchy construction and avoids external instantiation                               |
+| **Builder**                                 | `LogMessage.Builder`                              | Constructs complex immutable objects step-by-step      | Improves readability, enforces validation, and supports extensibility without telescoping constructors |
 
 ## UML
 
