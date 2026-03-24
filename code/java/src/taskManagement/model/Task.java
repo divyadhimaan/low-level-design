@@ -91,7 +91,9 @@ public class Task {
     }
 
     public void addLog(String log){
-        this.logs.add(new TaskActivityLog(log));
+        TaskActivityLog activityLog = new TaskActivityLog(log);
+        this.logs.add(activityLog);
+        System.out.println(activityLog.toString());
     }
 
     public static class TaskBuilder{

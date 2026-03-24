@@ -16,7 +16,7 @@ public class TaskManagementDemo {
         TaskManagementSystem taskManagementSystem = TaskManagementSystem.getInstance();
 
         //Create Users
-        User pm = taskManagementSystem.createUser("Product Manager", "pm@example.com")
+        User pm = taskManagementSystem.createUser("Product Manager", "pm@example.com");
         User user1 = taskManagementSystem.createUser("Alice", "alice@example.com");
         User user2 = taskManagementSystem.createUser("Bob", "bob@example.com");
 
