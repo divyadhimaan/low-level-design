@@ -5,8 +5,10 @@ import taskManagement.enums.TaskStatus;
 import taskManagement.model.Task;
 import taskManagement.model.Epic;
 import taskManagement.model.User;
+import taskManagement.strategy.TaskSortStrategy;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -84,5 +86,14 @@ public class TaskManagementSystem {
 
     }
 
-
+    public List<Task> searchTasks(String keyword, TaskSortStrategy sortStrategy){
+        List<Task> matchingTasks = new ArrayList<>();
+        for(Task task: tasks.values()){
+            if(task.getTitle().contains(keyword) || task.getDescription().contains(keyword)){
+                matchingTasks.add(task);
+            }
+        }
+        sortStrategy.sort(matchingTasks);
+        return matchingTasks;
+    }
 }
