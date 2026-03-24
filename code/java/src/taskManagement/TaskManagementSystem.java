@@ -85,14 +85,22 @@ public class TaskManagementSystem {
                 .collect(Collectors.toList());
 
     }
-
     public List<Task> searchTasks(String keyword, TaskSortStrategy sortStrategy){
-        List<Task> matchingTasks = new ArrayList<>();
-        for(Task task: tasks.values()){
-            if(task.getTitle().contains(keyword) || task.getDescription().contains(keyword)){
-                matchingTasks.add(task);
-            }
+        if (keyword == null || keyword.isEmpty()) {
+            return new ArrayList<>();
         }
+
+        String normalizedKeyword = keyword.toLowerCase();
+
+        List<Task> matchingTasks = tasks.values().stream()
+                .filter( task -> {
+                    String title = task.getTitle() != null ? task.getTitle().toLowerCase() : "";
+                    String description = task.getDescription() != null ? task.getDescription().toLowerCase() : "";
+
+                    return title.contains(normalizedKeyword) || description.contains(normalizedKeyword);
+                })
+                .collect(Collectors.toList());
+
         sortStrategy.sort(matchingTasks);
         return matchingTasks;
     }

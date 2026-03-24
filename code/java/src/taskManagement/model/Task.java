@@ -34,7 +34,7 @@ public class Task {
         this.dueDate = builder.dueDate;
         this.createdBy = builder.createdBy;
         this.assignee = builder.assignee;
-        this.tags = builder.tags;
+        this.tags = builder.tags != null ? builder.tags : new HashSet<>();
 
         this.currentState = new ToDoState();
         this.comments = new ArrayList<>();
@@ -82,7 +82,7 @@ public class Task {
     }
 
     public void display(String indent) {
-        System.out.println(indent + "- " + title + " [" + getCurrentState() + ", " + priority + ", Due: " + dueDate + "]");
+        System.out.println(indent + "- " + title + " [" + getCurrentState().getStatus() + ", " + priority + ", Due: " + dueDate + "]");
         if (!subTasks.isEmpty()) {
             for (Task subtask : subTasks) {
                 subtask.display(indent + "  ");
@@ -94,6 +94,11 @@ public class Task {
         TaskActivityLog activityLog = new TaskActivityLog(log);
         this.logs.add(activityLog);
         System.out.println(activityLog.toString());
+    }
+
+    public synchronized void addTag(Tag tag){
+        this.tags.add(tag);
+        addLog("Tag added: " + tag.getName());
     }
 
     public static class TaskBuilder{

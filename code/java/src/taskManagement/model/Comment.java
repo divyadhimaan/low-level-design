@@ -12,7 +12,7 @@ public class Comment {
     private final User author;
     private final LocalDateTime timestamp;
 
-    Comment(String content, User author){
+    public Comment(String content, User author){
         this.id = UUID.randomUUID().toString();
         this.content = content;
         this.author = author;
