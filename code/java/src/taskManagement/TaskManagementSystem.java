@@ -64,8 +64,8 @@ public class TaskManagementSystem {
         return task;
     }
 
-    public void addSubtask(Task task, Task subTask){
-        task.addSubtask(subTask);
+    public void deleteTask(String taskId){
+        tasks.remove(taskId);
     }
 
     public List<Task> ListTaskByUser(String userId){
