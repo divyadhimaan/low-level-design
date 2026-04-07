@@ -24,6 +24,7 @@ This repository serves as a comprehensive guide to Low-Level Design (LLD), aimed
   - [Generics](./concepts/oops/java.md#generics)
   - [Concurrency](./concepts/concurrency.md)
   - [Java Glossary](concepts/java/Glossary.md)
+  - [Stream API](./concepts/java/java-stream-practice.md)
 - [Springboot](./concepts/spring-boot/sb_overview.md)
   - [Dependency Inversion - IOC](./concepts/spring-boot/di-ioc.md)
   
