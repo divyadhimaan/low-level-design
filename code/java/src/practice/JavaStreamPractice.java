@@ -146,6 +146,52 @@ public class JavaStreamPractice {
                                 .collect(Collectors.joining())
                 )
         );
+
+        //TASK:Write a stream to create a frequency map from a list:
+
+        List<String> list = List.of("a", "b", "a", "c", "b", "a");
+
+        HashMap<String,Long> result = list.stream()
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                        .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                                .collect(Collectors.toMap(
+                                        Map.Entry::getKey,
+                                        Map.Entry::getValue,
+                                        (a,b) -> a,
+                                        LinkedHashMap::new
+                                ));
+        System.out.println(result);
+
+        // TASK: Group strings by first character
+        List<String> list2 = List.of("apple", "banana", "apricot", "blueberry");
+
+        Map<Character, List<String>> result_a = list2.stream()
+                .collect(Collectors.groupingBy(s -> s.charAt(0)));
+
+        System.out.println(result_a);
+
+        // TASK: Find the top 2 most frequent elements using Streams
+
+        List<String> list3 = List.of("apple", "banana", "apple", "cherry", "banana", "apple");
+
+        List<String> ans = list3.stream()
+                .collect(Collectors.groupingBy(
+                        Function.identity(),
+                        Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .limit(2)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        System.out.println(ans);
     }
 
 }
