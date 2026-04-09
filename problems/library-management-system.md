@@ -93,4 +93,4 @@ Returns all matching book copies with their details.
 ---
 
 
-[Java Implementation](./../code/src/libraryManagementSystem/LibraryManagementSystemSimulation.java) | [Design Explanation](./../code/src/libraryManagementSystem/LibraryManagmentSystem.md)
+[Java Implementation](../code/java/src/libraryManagementSystem/LibraryManagementSystemSimulation.java) | [Design Explanation](../code/java/src/libraryManagementSystem/LibraryManagmentSystem.md)

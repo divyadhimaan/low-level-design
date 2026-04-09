@@ -1,4 +1,4 @@
-package model;
+package libraryManagementSystem.model;
 
 import lombok.Getter;
 

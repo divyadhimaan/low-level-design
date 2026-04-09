@@ -1,3 +1,5 @@
+package libraryManagementSystem;
+
 import core.LibraryManagementSystem;
 
 import java.util.Arrays;
