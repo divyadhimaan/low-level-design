@@ -3,6 +3,10 @@ package RoomBookingSystem.orchestrator;
 import RoomBookingSystem.model.*;
 import RoomBookingSystem.repository.EmployeeInventory;
 import RoomBookingSystem.repository.RoomInventory;
+import RoomBookingSystem.strategy.RoomStrategy;
+import RoomBookingSystem.strategy.RecurringRoomStrategy;
+import RoomBookingSystem.strategy.BestFitStrategy;
+import RoomBookingSystem.strategy.BestFitRecurringStrategy;
 
 import java.util.*;
 
@@ -10,6 +14,8 @@ public class RoomBookingOrchestrator {
 
     private final RoomInventory roomInventory;
     private final EmployeeInventory employeeInventory;
+    private RoomStrategy roomSelectionStrategy;
+    private RecurringRoomStrategy recurringRoomSelectionStrategy;
 
     //Dependency Injection for better testability
     public RoomBookingOrchestrator(RoomInventory roomInventory, EmployeeInventory employeeInventory) {
@@ -18,6 +24,22 @@ public class RoomBookingOrchestrator {
         }
         this.roomInventory = roomInventory;
         this.employeeInventory = employeeInventory;
+        this.roomSelectionStrategy = new BestFitStrategy(); // Default single booking strategy
+        this.recurringRoomSelectionStrategy = new BestFitRecurringStrategy(); // Default recurring booking strategy
+    }
+
+    public void setRoomSelectionStrategy(RoomStrategy strategy) {
+        if(strategy == null) {
+            throw new IllegalArgumentException("RoomSelectionStrategy cannot be null.");
+        }
+        this.roomSelectionStrategy = strategy;
+    }
+
+    public void setRecurringRoomSelectionStrategy(RecurringRoomStrategy strategy) {
+        if(strategy == null) {
+            throw new IllegalArgumentException("RecurringRoomSelectionStrategy cannot be null.");
+        }
+        this.recurringRoomSelectionStrategy = strategy;
     }
 
     public void registerRoom(String roomName, String roomType, List<Integer> availableSlots){
@@ -291,60 +313,15 @@ public class RoomBookingOrchestrator {
 
     //helper methods
     private Room findBestRoom(int totalAttendees, List<Integer> requiredSlots) {
-        Collection<Room> rooms = roomInventory.getAllRooms().values();
-        Room bestRoom = null;
-
-        RoomType primaryType = (totalAttendees <= 10) ? RoomType.SMALL : RoomType.LARGE;
-        RoomType fallbackType = (primaryType == RoomType.SMALL) ? RoomType.LARGE : RoomType.SMALL;
-
-        // only consider small rooms
-        for (Room room : roomInventory.getAllRoomsByType(primaryType).values()) {
-            if (room.canBook(requiredSlots)) {
-                bestRoom = room;
-                break; // found a suitable small room
-            }
-        }
-
-        //if not found in small rooms, consider large rooms
-        if(bestRoom == null){
-            for (Room room : roomInventory.getAllRoomsByType(fallbackType).values()) {
-                if (room.canBook(requiredSlots)) {
-                    bestRoom = room;
-                    break; // found a suitable large room
-                }
-            }
-        }
-
-        return bestRoom;
+        List<Room> availableRooms = new ArrayList<>(roomInventory.getAllRooms().values());
+        return roomSelectionStrategy.selectRoom(availableRooms, requiredSlots);
     }
 
 
     private Room findBestRoom(int totalAttendees, Recurrence recurrence) {
-        Room bestRoom = null;
-
         List<Integer> requiredSlots = calculateRequiredSlots(recurrence.getStartSlot(), recurrence.getDurationInMinutes());
-
-
-        RoomType primaryType = (totalAttendees <= 10) ? RoomType.SMALL : RoomType.LARGE;
-        RoomType fallbackType = (primaryType == RoomType.SMALL) ? RoomType.LARGE : RoomType.SMALL;
-
-        for (Room room : roomInventory.getAllRoomsByType(primaryType).values()) {
-            if (room.canBookRecurring(recurrence, requiredSlots)) {
-                bestRoom = room;
-                break;
-            }
-        }
-
-        if (bestRoom == null) {
-            for (Room room : roomInventory.getAllRoomsByType(fallbackType).values()) {
-                if (room.canBookRecurring(recurrence, requiredSlots)) {
-                    bestRoom = room;
-                    break;
-                }
-            }
-        }
-
-        return bestRoom;
+        List<Room> availableRooms = new ArrayList<>(roomInventory.getAllRooms().values());
+        return recurringRoomSelectionStrategy.selectRoom(availableRooms, recurrence, requiredSlots);
     }
 
 
