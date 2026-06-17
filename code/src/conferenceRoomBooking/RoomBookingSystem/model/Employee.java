@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 @Getter
 public class Employee {
@@ -17,14 +18,14 @@ public class Employee {
         this.employeeId = UUID.randomUUID();
         this.employeeName = name;
         this.departmentName = department;
-        this.bookings = new ArrayList<>();
+        this.bookings = new CopyOnWriteArrayList<>();
     }
 
-    public void addBooking(Booking booking) {
+    public synchronized void addBooking(Booking booking) {
         bookings.add(booking);
     }
 
-    public void displayBookings(){
+    public synchronized void displayBookings(){
         if(bookings.isEmpty()){
             System.out.println("No bookings found for " + employeeName);
             return;
@@ -35,7 +36,7 @@ public class Employee {
         }
     }
 
-    public void removeBooking(Booking booking) {
+    public synchronized void removeBooking(Booking booking) {
         bookings.removeIf(b -> b.getBookingId().equals(booking.getBookingId()));
     }
 }

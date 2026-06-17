@@ -16,7 +16,7 @@ public class RoomBookingSystem {
         this.orchestrator = new RoomBookingOrchestrator(new RoomInventory(), new EmployeeInventory());
     }
 
-    public static  RoomBookingSystem getInstance()
+    public static synchronized RoomBookingSystem getInstance()
     {
         if(systemInstance==null)
             systemInstance = new RoomBookingSystem();

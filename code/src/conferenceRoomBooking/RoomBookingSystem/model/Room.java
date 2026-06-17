@@ -21,7 +21,7 @@ public class Room {
         this.bookedSlotsByDay = new HashMap<>();
     }
 
-    public boolean bookSlots(int day, List<Integer> slots, Booking booking) {
+    public synchronized boolean bookSlots(int day, List<Integer> slots, Booking booking) {
         if (!canBookForDay(day, slots)) return false;
 
         bookedSlotsByDay.putIfAbsent(day, new HashMap<>());
@@ -33,7 +33,7 @@ public class Room {
     }
 
 
-    public void displayBookings() {
+    public synchronized void displayBookings() {
         if (bookedSlotsByDay.isEmpty()) {
             System.out.println("No bookings for this room yet.");
             return;
@@ -71,7 +71,7 @@ public class Room {
 
 
 
-    public boolean canBookForDay(int day, List<Integer> slots) {
+    public synchronized boolean canBookForDay(int day, List<Integer> slots) {
         Map<Integer, Booking> dayBookings = bookedSlotsByDay.getOrDefault(day, new HashMap<>());
         for (int slotId : slots) {
             if (dayBookings.containsKey(slotId)) return false; // conflict
@@ -79,11 +79,11 @@ public class Room {
         return true;
     }
 
-    public boolean canBook(List<Integer> slots) {
+    public synchronized boolean canBook(List<Integer> slots) {
         return canBookForDay(0, slots);
     }
 
-    public boolean canBookRecurring(Recurrence recurrence, List<Integer> requiredSlots) {
+    public synchronized boolean canBookRecurring(Recurrence recurrence, List<Integer> requiredSlots) {
         int currentDay = 0;
         int incrementDays = switch (recurrence.getFrequencyType()) {
             case DAILY -> 1;
@@ -102,7 +102,7 @@ public class Room {
         return true;
     }
 
-    public void cancelBooking(int day, List<Integer> slots) {
+    public synchronized void cancelBooking(int day, List<Integer> slots) {
         Map<Integer, Booking> dayBookings = bookedSlotsByDay.get(day);
         if (dayBookings != null) {
             for (int slotId : slots) {

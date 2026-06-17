@@ -109,17 +109,16 @@ public class RoomBookingOrchestrator {
 
         List<Integer> requiredSlots = calculateRequiredSlots(startSlot, durationMinutes);
 
-
         Booking booking = null;
 
-        synchronized (roomInventory) { // lock inventory while finding and booking
-            Room bestFitRoom = findBestRoom(totalAttendees, requiredSlots);
+        // Find best room without holding inventory lock - getAllRooms() returns a safe snapshot
+        Room bestFitRoom = findBestRoom(totalAttendees, requiredSlots);
 
-            if (bestFitRoom != null) {
-                synchronized (bestFitRoom) { // lock room while booking
-                    if (bestFitRoom.canBook(requiredSlots)) { // double-check availability
-                        booking = createBooking(bestFitRoom, 0, requiredSlots, employeeName);
-                    }
+        // Only lock the specific room while booking to avoid nested synchronization deadlock
+        if (bestFitRoom != null) {
+            synchronized (bestFitRoom) {
+                if (bestFitRoom.canBook(requiredSlots)) { // double-check availability
+                    booking = createBooking(bestFitRoom, 0, requiredSlots, employeeName);
                 }
             }
         }
@@ -238,26 +237,27 @@ public class RoomBookingOrchestrator {
             totalOccurrences *= 7; // book every day in each week
         }
 
-        // Proceed with booking
-        for(int i=0; i<totalOccurrences; i++){
-            if(!bestFitRoom.canBookForDay(currentDay, requiredSlots)){
-                System.out.println("Booking failed: Room not available on day " + currentDay);
-                // rollback previously booked slots
-                for(Booking b : bookings){
-                    bestFitRoom.cancelBooking(b.getDay(), b.getBookedSlots());
-                    Employee emp = employeeInventory.getEmployeeByName(employeeName);
-                    if(emp != null) emp.removeBooking(b);
+        // Proceed with booking - synchronized to ensure atomicity of all occurrences
+        synchronized (bestFitRoom) {
+            for(int i=0; i<totalOccurrences; i++){
+                if(!bestFitRoom.canBookForDay(currentDay, requiredSlots)){
+                    System.out.println("Booking failed: Room not available on day " + currentDay);
+                    // rollback previously booked slots
+                    for(Booking b : bookings){
+                        bestFitRoom.cancelBooking(b.getDay(), b.getBookedSlots());
+                        Employee emp = employeeInventory.getEmployeeByName(employeeName);
+                        if(emp != null) emp.removeBooking(b);
+                    }
+                    bookings.clear();
+                    return bookings;
                 }
-                bookings.clear();
-                return bookings;
+
+                Booking booking = createBooking(bestFitRoom, currentDay, requiredSlots, employeeName);
+                bookings.add(booking);
+
+                currentDay += incrementDays;
             }
-
-            Booking booking = createBooking(bestFitRoom, currentDay, requiredSlots, employeeName);
-            bookings.add(booking);
-
-            currentDay += incrementDays;
         }
-
 
         System.out.println("Recurring booking successful for " + bookings.size() + " occurrences (" + recurrence.getFrequencyType() + ")");
 
@@ -267,7 +267,7 @@ public class RoomBookingOrchestrator {
 
 
 
-    public void viewRoomSchedule(){
+    public synchronized void viewRoomSchedule(){
         Map<String, Room> allRooms = roomInventory.getAllRooms();
         System.out.println("------------------- Room Schedules ----------------------- ");
         for (Map.Entry<String, Room> entry : allRooms.entrySet()) {
@@ -278,7 +278,7 @@ public class RoomBookingOrchestrator {
         }
     }
 
-    public void viewEmployeeBookings(){
+    public synchronized void viewEmployeeBookings(){
         Map<UUID, Employee> allEmployees = employeeInventory.getAllEmployees();
         System.out.println("------------------- Employee Bookings ----------------------- ");
         for (Map.Entry<UUID, Employee> entry : allEmployees.entrySet()) {

@@ -5,19 +5,20 @@ import RoomBookingSystem.model.Employee;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EmployeeInventory {
     Map<UUID, Employee> employeeList;
 
     public EmployeeInventory() {
-        this.employeeList = new HashMap<>();
+        this.employeeList = new ConcurrentHashMap<>();
     }
 
-    public void addEmployee(Employee employee) {
+    public synchronized void addEmployee(Employee employee) {
         employeeList.put(employee.getEmployeeId(), employee);
     }
 
-    public Employee getEmployeeByName(String name) {
+    public synchronized Employee getEmployeeByName(String name) {
         for (Employee e : employeeList.values()) {
             if (e.getEmployeeName().equals(name)) { //shouldn't ignore case here.
                 return e;
@@ -26,11 +27,11 @@ public class EmployeeInventory {
         return null;
     }
 
-    public Map<UUID, Employee> getAllEmployees() {
-        return employeeList;
+    public synchronized Map<UUID, Employee> getAllEmployees() {
+        return new HashMap<>(employeeList);
     }
 
-    public boolean checkEmployeeExists(String name) {
+    public synchronized boolean checkEmployeeExists(String name) {
         return getEmployeeByName(name) != null;
     }
 }
