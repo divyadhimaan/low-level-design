@@ -287,6 +287,218 @@ system.viewSchedule();  // Thread-safe snapshot view
 
 ---
 
+## Class Diagram
+
+```mermaid
+classDiagram
+    %% ============================================
+    %% SINGLETON & FACADE
+    %% ============================================
+    class RoomBookingSystem {
+        -systemInstance : RoomBookingSystem
+        -orchestrator : RoomBookingOrchestrator
+        +getInstance()* RoomBookingSystem
+        +registerRoom(String, String, List<Integer>)
+        +registerEmployee(String, String)
+        +bookRoom(String, int, int, int)
+        +bookRoomRecurring(String, int, int, int, int, int, String)
+        +showAllRegisteredRooms()
+        +showAllRegisteredEmployees()
+        +viewSchedule()
+    }
+
+    %% ============================================
+    %% ORCHESTRATOR
+    %% ============================================
+    class RoomBookingOrchestrator {
+        -roomInventory : RoomInventory
+        -employeeInventory : EmployeeInventory
+        -roomSelectionStrategy : RoomStrategy
+        -recurringRoomSelectionStrategy : RecurringRoomStrategy
+        +registerRoom(String, String, List~Integer~)
+        +registerEmployee(String, String)
+        +bookRoom(String, int, int, int)
+        +bookRoom(String, int, Recurrence) List<Booking>
+        +setRoomSelectionStrategy(RoomStrategy)
+        +setRecurringRoomSelectionStrategy(RecurringRoomStrategy)
+        +viewRoomSchedule()
+        +viewEmployeeBookings()
+        -findBestRoom(int, List~Integer~) Room
+        -findBestRoom(int, Recurrence) Room
+    }
+
+    %% ============================================
+    %% REPOSITORIES
+    %% ============================================
+    class RoomInventory {
+        -roomList : ConcurrentHashMap
+        +addRoom(Room)
+        +getRoom(String) Room
+        +getAllRooms()* Map~String, Room~
+        +getAllRoomsByType(RoomType)* Map~String, Room~
+    }
+
+    class EmployeeInventory {
+        -employeeList : ConcurrentHashMap
+        +addEmployee(Employee)
+        +getEmployeeByName(String)* Employee
+        +getAllEmployees()* Map~UUID, Employee~
+        +checkEmployeeExists(String) boolean
+    }
+
+    %% ============================================
+    %% DOMAIN MODELS
+    %% ============================================
+    class Room {
+        -roomId : String
+        -roomName : String
+        -roomType : RoomType
+        -availableSlots : Set~Integer~
+        -bookedSlotsByDay : Map~Integer, Map~Integer, Booking~~
+        +bookSlots(int, List~Integer~, Booking)* boolean
+        +canBook(List~Integer~)* boolean
+        +canBookForDay(int, List~Integer~)* boolean
+        +canBookRecurring(Recurrence, List~Integer~)* boolean
+        +cancelBooking(int, List~Integer~)
+        +displayBookings()
+    }
+
+    class Employee {
+        -employeeId : UUID
+        -employeeName : String
+        -departmentName : String
+        -bookings : CopyOnWriteArrayList~Booking~
+        +addBooking(Booking)
+        +removeBooking(Booking)
+        +displayBookings()
+    }
+
+    class Booking {
+        -bookingId : UUID
+        -room : Room
+        -bookedSlots : List~Integer~
+        -employeeName : String
+        -day : int
+        +getBookingId() UUID
+        +getRoom() Room
+        +getBookedSlots() List~Integer~
+        +getEmployeeName() String
+        +getDay() int
+    }
+
+    class Recurrence {
+        -recurrenceId : UUID
+        -numberOfWeeks : int
+        -startSlot : int
+        -durationInMinutes : int
+        -dayOfWeek : int
+        -frequencyType : FrequencyType
+        +getNumberOfWeeks() int
+        +getStartSlot() int
+        +getDurationInMinutes() int
+        +getDayOfWeek() int
+        +getFrequencyType() FrequencyType
+    }
+
+    %% ============================================
+    %% ENUMS
+    %% ============================================
+    class RoomType {
+        <<enumeration>>
+        SMALL
+        LARGE
+    }
+
+    class FrequencyType {
+        <<enumeration>>
+        DAILY
+        WEEKLY
+        BIWEEKLY
+        MONTHLY
+    }
+
+    %% ============================================
+    %% STRATEGY PATTERN - SINGLE BOOKINGS
+    %% ============================================
+    class RoomStrategy {
+        <<interface>>
+        +selectRoom(List~Room~, List~Integer~)* Room
+    }
+
+    class BestFitStrategy {
+        +selectRoom(List~Room~, List~Integer~) Room
+    }
+
+    class FirstAvailableStrategy {
+        +selectRoom(List~Room~, List~Integer~) Room
+    }
+
+    class LargestAvailableStrategy {
+        +selectRoom(List~Room~, List~Integer~) Room
+    }
+
+    %% ============================================
+    %% STRATEGY PATTERN - RECURRING BOOKINGS
+    %% ============================================
+    class RecurringRoomStrategy {
+        <<interface>>
+        +selectRoom(List~Room~, Recurrence, List~Integer~)* Room
+    }
+
+    class BestFitRecurringStrategy {
+        +selectRoom(List~Room~, Recurrence, List~Integer~) Room
+    }
+
+    class FirstAvailableRecurringStrategy {
+        +selectRoom(List~Room~, Recurrence, List~Integer~) Room
+    }
+
+    class LargestAvailableRecurringStrategy {
+        +selectRoom(List~Room~, Recurrence, List~Integer~) Room
+    }
+
+    %% ============================================
+    %% RELATIONSHIPS
+    %% ============================================
+    
+    %% Singleton
+    RoomBookingSystem --> RoomBookingOrchestrator : delegates to
+    
+    %% Orchestrator to Repositories
+    RoomBookingOrchestrator --> RoomInventory : uses
+    RoomBookingOrchestrator --> EmployeeInventory : uses
+    
+    %% Orchestrator to Strategies
+    RoomBookingOrchestrator --> RoomStrategy : uses (single bookings)
+    RoomBookingOrchestrator --> RecurringRoomStrategy : uses (recurring bookings)
+    
+    %% Repositories to Domain
+    RoomInventory --> Room : manages 1..*
+    EmployeeInventory --> Employee : manages 1..*
+    
+    %% Room and Employee to Booking
+    Room --> Booking : has 0..*
+    Employee --> Booking : has 0..*
+    
+    %% Orchestrator to Recurrence
+    RoomBookingOrchestrator --> Recurrence : uses
+    
+    %% Room Type Relationship
+    Room --> RoomType : has
+    Recurrence --> FrequencyType : has
+    
+    %% Strategy Implementations
+    RoomStrategy <|.. BestFitStrategy : implements
+    RoomStrategy <|.. FirstAvailableStrategy : implements
+    RoomStrategy <|.. LargestAvailableStrategy : implements
+    
+    RecurringRoomStrategy <|.. BestFitRecurringStrategy : implements
+    RecurringRoomStrategy <|.. FirstAvailableRecurringStrategy : implements
+    RecurringRoomStrategy <|.. LargestAvailableRecurringStrategy : implements
+```
+
+---
+
 ## Architecture
 
 ### Class Hierarchy
