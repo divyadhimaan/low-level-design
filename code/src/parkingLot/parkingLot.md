@@ -57,11 +57,7 @@
 ## Known Gaps
 
 - **`LocalTime` instead of `LocalDateTime`** — stays crossing midnight produce incorrect durations. `Math.abs` masks the issue. Fix: use `LocalDateTime` or `Instant` for entry/exit times.
-- **`MinutePaymentStrategy` bug** — divides duration by `1000 * 60` (milliseconds denominator) but receives minutes from `PaymentService`. Should use `duration` directly.
-- **`ParkingLotTicket` constructor is `public`** — should be `private` to enforce creation exclusively through the Builder.
 - **Tickets kept in inventory after exit** — tickets are marked `COMPLETED` but remain in `TicketInventory`. Acceptable for audit purposes; a production system would archive or purge old records periodically.
-- **`exit()` not synchronized** — a spot is vacated outside any lock, which can race with a concurrent `entry()` finding that spot mid-vacate. Wrap `vacateSpot()` in a `synchronized (this)` block.
-- **`PaymentProcessor.java` in root** — stale unused file leftover from earlier iteration, should be deleted.
 
 ## Class Diagram
 
