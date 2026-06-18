@@ -12,6 +12,6 @@ Requirements
 
 
 
-### [Java Implementation](./../code/src/parkingLot)
+### [Java Implementation](./../code/src/parkingLot/ParkingLotDemo.java)
 
 ### [Design Explanation](./../code/src/parkingLot/parkingLot.md)

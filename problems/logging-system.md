@@ -10,4 +10,4 @@
 - It should be extensible to accommodate new log levels and output destinations in the future.
 
 
-[Java Implementation](./../code/java/src/loggingSystem/LoggingDemo.java)
+[Java Implementation](../code/src/loggingSystem/LoggingDemo.java)
