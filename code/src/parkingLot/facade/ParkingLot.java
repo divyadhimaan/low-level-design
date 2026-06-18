@@ -77,17 +77,16 @@ public class ParkingLot {
             throw new IllegalArgumentException("No Vehicle entered with this ID");
         }
 
-        ticket.getParkingSpot().vacateSpot();
 
         System.out.println("Valid Ticket Found. Processing Payment");
 
         Double amount = paymentService.calculatePaymentAmount(ticket, strategy, exitTime);
-
         System.out.println("Payable Amount: " + amount);
-
         paymentService.processPayment(amount, ticket);
 
-
+        synchronized (this) {
+            ticket.getParkingSpot().vacateSpot();
+        }
     }
 
     public ParkingSpot findAvailableSpot(VehicleType vehicleType)
