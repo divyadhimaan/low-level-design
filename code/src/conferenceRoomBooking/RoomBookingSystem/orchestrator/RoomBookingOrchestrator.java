@@ -7,8 +7,10 @@ import RoomBookingSystem.strategy.RoomStrategy;
 import RoomBookingSystem.strategy.RecurringRoomStrategy;
 import RoomBookingSystem.strategy.BestFitStrategy;
 import RoomBookingSystem.strategy.BestFitRecurringStrategy;
+import RoomBookingSystem.observer.BookingObserver;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class RoomBookingOrchestrator {
 
@@ -16,6 +18,7 @@ public class RoomBookingOrchestrator {
     private final EmployeeInventory employeeInventory;
     private RoomStrategy roomSelectionStrategy;
     private RecurringRoomStrategy recurringRoomSelectionStrategy;
+    private final List<BookingObserver> bookingObservers;
 
     //Dependency Injection for better testability
     public RoomBookingOrchestrator(RoomInventory roomInventory, EmployeeInventory employeeInventory) {
@@ -26,6 +29,7 @@ public class RoomBookingOrchestrator {
         this.employeeInventory = employeeInventory;
         this.roomSelectionStrategy = new BestFitStrategy(); // Default single booking strategy
         this.recurringRoomSelectionStrategy = new BestFitRecurringStrategy(); // Default recurring booking strategy
+        this.bookingObservers = new CopyOnWriteArrayList<>(); // Thread-safe observer list
     }
 
     public void setRoomSelectionStrategy(RoomStrategy strategy) {
@@ -40,6 +44,42 @@ public class RoomBookingOrchestrator {
             throw new IllegalArgumentException("RecurringRoomSelectionStrategy cannot be null.");
         }
         this.recurringRoomSelectionStrategy = strategy;
+    }
+
+    // Observer Pattern Methods
+    public synchronized void subscribe(BookingObserver observer) {
+        if(observer == null) {
+            throw new IllegalArgumentException("Observer cannot be null.");
+        }
+        bookingObservers.add(observer);
+    }
+
+    public synchronized void unsubscribe(BookingObserver observer) {
+        bookingObservers.remove(observer);
+    }
+
+    private void notifyBookingCreated(Booking booking) {
+        for (BookingObserver observer : bookingObservers) {
+            observer.onBookingCreated(booking);
+        }
+    }
+
+    private void notifyRecurringBookingCreated(List<Booking> bookings) {
+        for (BookingObserver observer : bookingObservers) {
+            observer.onRecurringBookingCreated(bookings);
+        }
+    }
+
+    private void notifyBookingCancelled(Booking booking) {
+        for (BookingObserver observer : bookingObservers) {
+            observer.onBookingCancelled(booking);
+        }
+    }
+
+    private void notifyRecurringBookingCancelled(List<Booking> bookings) {
+        for (BookingObserver observer : bookingObservers) {
+            observer.onRecurringBookingCancelled(bookings);
+        }
     }
 
     public void registerRoom(String roomName, String roomType, List<Integer> availableSlots){
@@ -147,6 +187,7 @@ public class RoomBookingOrchestrator {
 
         if (booking != null) {
             printBookingConfirmation(booking);
+            notifyBookingCreated(booking);  // Notify all observers
         } else {
             System.out.println("Booking failed: No suitable rooms available or slots already booked.");
         }
@@ -284,6 +325,7 @@ public class RoomBookingOrchestrator {
         System.out.println("Recurring booking successful for " + bookings.size() + " occurrences (" + recurrence.getFrequencyType() + ")");
 
         printRecurringBookingConfirmation(bookings, recurrence);
+        notifyRecurringBookingCreated(bookings);  // Notify all observers
         return bookings;
     }
 

@@ -23,6 +23,10 @@ public class RoomBookingSystem {
         return systemInstance;
     }
 
+    public RoomBookingOrchestrator getOrchestrator() {
+        return orchestrator;
+    }
+
     public void registerRoom(String roomName, String roomType, List<Integer> availableSlots) {
         orchestrator.registerRoom(roomName, roomType, availableSlots);
     }
