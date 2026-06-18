@@ -66,7 +66,7 @@ This Room Booking System is a comprehensive, production-ready application that a
 - **For Recurring Bookings**: `RecurringRoomStrategy` interface with 3 implementations
 - **Purpose**: Runtime-switchable room selection algorithms
 
-### 5. Observer Pattern ⭐ **NEW**
+### 5. Observer Pattern 
 - **Interface**: `BookingObserver`
 - **Implementations**: 
   - `EmailObserver` - Send email notifications
@@ -75,7 +75,17 @@ This Room Booking System is a comprehensive, production-ready application that a
 - **Purpose**: Notify multiple subscribers when bookings are created/cancelled
 - **Benefits**: Loose coupling, extensible notification system
 
-### 6. Repository Pattern
+### 6. Builder Pattern 
+- **Class**: `Recurrence.Builder`
+- **Purpose**: Construct complex Recurrence objects with fluent API
+- **Benefits**: Improved readability, validation, optional parameters, immutability
+- **Advantages Over Constructor**: 
+  - Self-documenting code
+  - Handles optional fields elegantly
+  - Validates parameters in build()
+  - Prevents constructor overloading hell
+
+### 7. Repository Pattern
 - **Classes**: `RoomInventory`, `EmployeeInventory`
 - **Purpose**: Abstract data access logic with consistent interface
 
@@ -362,6 +372,164 @@ orchestrator.subscribe(new SMSObserver());
 
 ---
 
+## Builder Pattern
+
+### Purpose
+Simplify construction of complex Recurrence objects with validation, optional parameters, and fluent API.
+
+### Problem It Solves
+**Before (Constructor Hell):**
+```java
+// Hard to read and remember parameter order
+Recurrence recurrence = new Recurrence(4, 9, 60, 3, "WEEKLY");
+// Is 4 the numberOfWeeks or startSlot? What does 9 mean?
+
+// Multiple overloaded constructors for different combinations
+public Recurrence(int weeks, int slot, int duration, int day, String frequency)
+public Recurrence(int weeks, int slot, int duration, int day)
+// ... more overloads ...
+```
+
+### Solution (Builder Pattern)
+**After (Clear and Readable):**
+```java
+Recurrence recurrence = new Recurrence.Builder(
+    numberOfWeeks: 4,
+    startSlot: 9,
+    durationInMinutes: 60,
+    dayOfWeek: 3
+)
+.withFrequency("WEEKLY")
+.build();
+```
+
+### Builder Implementation
+
+```java
+public class Recurrence {
+    // Required fields (final after build)
+    private final int numberOfWeeks;
+    private final int startSlot;
+    private final int durationInMinutes;
+    private final int dayOfWeek;
+    
+    // Optional field with default
+    private final FrequencyType frequencyType;
+
+    public static class Builder {
+        // Required fields
+        private final int numberOfWeeks;
+        private final int startSlot;
+        private final int durationInMinutes;
+        private final int dayOfWeek;
+        
+        // Optional with default
+        private FrequencyType frequencyType = FrequencyType.WEEKLY;
+
+        public Builder(int numberOfWeeks, int startSlot, int durationInMinutes, int dayOfWeek) {
+            this.numberOfWeeks = numberOfWeeks;
+            this.startSlot = startSlot;
+            this.durationInMinutes = durationInMinutes;
+            this.dayOfWeek = dayOfWeek;
+        }
+
+        public Builder withFrequency(FrequencyType frequencyType) {
+            this.frequencyType = frequencyType;
+            return this;  // Fluent API
+        }
+
+        public Builder withFrequency(String frequency) {
+            this.frequencyType = FrequencyType.valueOf(frequency.toUpperCase());
+            return this;
+        }
+
+        public Recurrence build() {
+            validateFields();  // Validate before building
+            return new Recurrence(this);
+        }
+
+        private void validateFields() {
+            if (numberOfWeeks <= 0 || numberOfWeeks > 52)
+                throw new IllegalArgumentException("Weeks must be 1-52");
+            if (startSlot < 1 || startSlot > 10)
+                throw new IllegalArgumentException("Slot must be 1-10");
+            if (durationInMinutes <= 0 || durationInMinutes > 600)
+                throw new IllegalArgumentException("Duration must be 1-600 minutes");
+            if (dayOfWeek < 1 || dayOfWeek > 6)
+                throw new IllegalArgumentException("Day must be 1-6");
+        }
+    }
+}
+```
+
+### Usage Examples
+
+#### Basic Usage (With Default Frequency = WEEKLY)
+```java
+Recurrence recurrence = new Recurrence.Builder(4, 9, 60, 3)
+    .build();
+// Uses default WEEKLY frequency
+```
+
+#### Custom Frequency with String
+```java
+Recurrence recurrence = new Recurrence.Builder(4, 9, 60, 3)
+    .withFrequency("DAILY")
+    .build();
+```
+
+#### Custom Frequency with Enum
+```java
+Recurrence recurrence = new Recurrence.Builder(4, 9, 60, 3)
+    .withFrequency(FrequencyType.BIWEEKLY)
+    .build();
+```
+
+#### In Demo/Simulation
+```java
+var weeklyRecurrence = new Recurrence.Builder(3, 3, 60, 3)
+    .withFrequency("WEEKLY")
+    .build();
+System.out.println("Built: " + weeklyRecurrence);
+bookingRoomSystem.bookRoomRecurring("David", 5, weeklyRecurrence);
+
+var dailyRecurrence = new Recurrence.Builder(2, 7, 30, 1)
+    .withFrequency("DAILY")
+    .build();
+bookingRoomSystem.bookRoomRecurring("Bob", 13, dailyRecurrence);
+```
+
+### Benefits
+
+| Aspect | Before | After |
+|--------|--------|-------|
+| **Readability** | Constructor parameters unclear | Self-documenting fluent API |
+| **Parameters** | Fixed order required | Named, flexible order |
+| **Defaults** | N/A | Easy to handle optional fields |
+| **Validation** | In constructor (hidden) | Explicit in build() |
+| **Immutability** | Constructor assigns | Builder ensures immutability |
+| **Flexibility** | Constructor overloads | Single Builder class |
+
+### Thread Safety
+- Recurrence objects are immutable after build()
+- Builder is used temporarily, then discarded
+- Multiple threads can safely create independent Recurrences
+
+### Backward Compatibility
+- Original constructor still supported for legacy code
+- New code should use Builder
+```java
+// Old way still works
+Recurrence r = new Recurrence(4, 9, 60, 3, "WEEKLY");
+
+// New recommended way
+Recurrence r = new Recurrence.Builder(4, 9, 60, 3)
+    .withFrequency("WEEKLY")
+    .build();
+```
+
+---
+
 ## Booking Sequence
 
 ### Single Booking Flow
@@ -390,6 +558,8 @@ orchestrator.subscribe(new SMSObserver());
 
 ### Setup
 ```java
+// System automatically initializes with default observers
+// (EmailObserver, CalendarObserver, SlackObserver)
 RoomBookingSystem system = RoomBookingSystem.getInstance();
 
 system.registerRoom("Conference A", "SMALL", List.of(1,2,3,4,5,6,7,8,9,10));
@@ -397,6 +567,19 @@ system.registerRoom("Meeting Hall", "LARGE", List.of(1,2,3,4,5,6,7,8,9,10));
 
 system.registerEmployee("John Doe", "Engineering");
 system.registerEmployee("Jane Smith", "Marketing");
+```
+
+### Custom Observers (Optional)
+```java
+// You can add additional observers or replace default ones
+RoomBookingSystem system = RoomBookingSystem.getInstance();
+RoomBookingOrchestrator orchestrator = system.getOrchestrator();
+
+// Add additional observer
+orchestrator.subscribe(new SMSObserver());
+
+// Or unsubscribe from default observers if needed
+// orchestrator.unsubscribe(emailObserver);
 ```
 
 ### Single Booking (Default Strategy)
@@ -425,9 +608,29 @@ orchestrator.setRecurringRoomSelectionStrategy(
 system.bookRoomRecurring("Jane Smith", 20, 10, 120, 6, 3, "WEEKLY");
 ```
 
+### Recurring Booking (Using Builder Pattern)
+```java
+// More readable way using Builder pattern
+var weeklyMeeting = new Recurrence.Builder(4, 9, 60, 3)
+    .withFrequency("WEEKLY")
+    .build();
+system.bookRoomRecurring("John Doe", 8, weeklyMeeting);
+
+// With custom strategy
+orchestrator.setRecurringRoomSelectionStrategy(
+    new FirstAvailableRecurringStrategy()
+);
+
+var dailyStandup = new Recurrence.Builder(2, 7, 30, 1)
+    .withFrequency("DAILY")
+    .build();
+system.bookRoomRecurring("Jane Smith", 5, dailyStandup);
+```
+
 ### View Schedules
 ```java
 system.viewSchedule();  // Thread-safe snapshot view
+// Automatically triggers all observers to display/sync booking information
 ```
 
 ---

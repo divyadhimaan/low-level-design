@@ -7,6 +7,7 @@ import RoomBookingSystem.observer.EmailObserver;
 import RoomBookingSystem.observer.CalendarObserver;
 import RoomBookingSystem.observer.SlackObserver;
 
+import java.time.LocalTime;
 import java.util.List;
 
 public class RoomBookingSystemSimulation {
@@ -42,10 +43,10 @@ public class RoomBookingSystemSimulation {
         System.out.println("║        Creating Single Bookings         ║");
         System.out.println("╚════════════════════════════════════════╝\n");
 
-        bookingRoomSystem.bookRoom("Alice", 7, 2, 30);
-        bookingRoomSystem.bookRoom("Bob", 12, 1, 90);
-        bookingRoomSystem.bookRoom("Charlie", 3, 1, 90);
-        bookingRoomSystem.bookRoom("Alice", 7, 2, 180);
+        bookingRoomSystem.bookRoom("Alice",   7,  LocalTime.of(10, 0), LocalTime.of(10, 30));
+        bookingRoomSystem.bookRoom("Bob",     12, LocalTime.of(9,  0), LocalTime.of(10, 30));
+        bookingRoomSystem.bookRoom("Charlie", 3,  LocalTime.of(9,  0), LocalTime.of(10, 30)); // fails: Charlie not registered
+        bookingRoomSystem.bookRoom("Alice",   7,  LocalTime.of(10, 0), LocalTime.of(13, 0));
 
         // ====== RECURRING BOOKINGS WITH BUILDER PATTERN ======
         System.out.println("\n╔════════════════════════════════════════╗");
@@ -53,13 +54,13 @@ public class RoomBookingSystemSimulation {
         System.out.println("╚════════════════════════════════════════╝\n");
 
         // Using Builder Pattern for Recurrence - Much more readable!
-        var weeklyRecurrence = new Builder(3, 3, 60, 3)
+        var weeklyRecurrence = new Builder(3, LocalTime.of(11,0,0), LocalTime.of(12,0,0), 3)
                 .withFrequency("WEEKLY")
                 .build();
         System.out.println("📋 Weekly recurrence built: " + weeklyRecurrence);
         bookingRoomSystem.bookRoomRecurring("David", 5, weeklyRecurrence);
 
-        var dailyRecurrence = new Builder(2, 7, 30, 1)
+        var dailyRecurrence = new Builder(2, LocalTime.of(13,0,0), LocalTime.of(14,0,0), 1)
                 .withFrequency("DAILY")
                 .build();
         System.out.println("📋 Daily recurrence built: " + dailyRecurrence);

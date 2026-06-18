@@ -11,12 +11,13 @@ public class SlackObserver implements BookingObserver {
             ":calendar: **Room Booking Confirmation**\n" +
             "Employee: %s\n" +
             "Room: %s\n" +
-            "Day: %d | Slots: %s\n" +
+            "Day: %d | Time: %s – %s\n" +
             "Booking ID: %s",
             booking.getEmployeeName(),
             booking.getRoom().getRoomName(),
             booking.getDay(),
-            booking.getBookedSlots(),
+            booking.getStartTime(),
+            booking.getEndTime(),
             booking.getBookingId()
         );
         sendSlackMessage("#room-bookings", message);
@@ -34,12 +35,13 @@ public class SlackObserver implements BookingObserver {
             "Employee: %s\n" +
             "Room: %s\n" +
             "Occurrences: %d\n" +
-            "First Booking - Day: %d, Slots: %s",
+            "First Booking - Day: %d, Time: %s – %s",
             firstBooking.getEmployeeName(),
             firstBooking.getRoom().getRoomName(),
             bookings.size(),
             firstBooking.getDay(),
-            firstBooking.getBookedSlots()
+            firstBooking.getStartTime(),
+            firstBooking.getEndTime()
         );
         sendSlackMessage("#room-bookings", message);
     }

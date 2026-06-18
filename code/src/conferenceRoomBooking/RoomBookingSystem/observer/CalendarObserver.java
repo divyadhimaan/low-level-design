@@ -13,13 +13,14 @@ public class CalendarObserver implements BookingObserver {
             "Employee: %s%n" +
             "Room: %s%n" +
             "Day: %d%n" +
-            "Slots: %s%n" +
+            "Time: %s – %s%n" +
             "Event ID: %s",
             booking.getRoom().getRoomName(),
             booking.getEmployeeName(),
             booking.getRoom().getRoomName(),
             booking.getDay(),
-            booking.getBookedSlots(),
+            booking.getStartTime(),
+            booking.getEndTime(),
             "CALENDAR-" + booking.getBookingId()
         );
         addToCalendar(booking.getEmployeeName(), eventDetails);
@@ -38,13 +39,14 @@ public class CalendarObserver implements BookingObserver {
             "Employee: %s%n" +
             "Room: %s%n" +
             "Total Occurrences: %d%n" +
-            "First Occurrence - Day: %d, Slots: %s",
+            "First Occurrence - Day: %d, Time: %s – %s",
             firstBooking.getRoom().getRoomName(),
             firstBooking.getEmployeeName(),
             firstBooking.getRoom().getRoomName(),
             bookings.size(),
             firstBooking.getDay(),
-            firstBooking.getBookedSlots()
+            firstBooking.getStartTime(),
+            firstBooking.getEndTime()
         );
 
         for (Booking booking : bookings) {

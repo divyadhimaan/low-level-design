@@ -2,14 +2,17 @@ package RoomBookingSystem.model;
 
 import lombok.Getter;
 
+import java.time.LocalTime;
 import java.util.UUID;
+
 
 @Getter
 public class Recurrence {
     private final UUID recurrenceId;
     private final int numberOfWeeks;
-    private final int startSlot;
-    private final int durationInMinutes;
+    private final LocalTime start;
+    private final LocalTime end;
+//    private final int durationInMinutes;
     private final int dayOfWeek;
     private final FrequencyType frequencyType;
 
@@ -17,28 +20,32 @@ public class Recurrence {
     private Recurrence(Builder builder) {
         this.recurrenceId = UUID.randomUUID();
         this.numberOfWeeks = builder.numberOfWeeks;
-        this.startSlot = builder.startSlot;
-        this.durationInMinutes = builder.durationInMinutes;
+        this.start = builder.start;
+        this.end = builder.end;
+//        this.durationInMinutes = builder.durationInMinutes;
         this.dayOfWeek = builder.dayOfWeek;
         this.frequencyType = builder.frequencyType;
     }
 
     // Legacy constructor for backward compatibility
-    public Recurrence(int numberOfWeeks, int startSlot, int durationInMinutes, int dayOfWeek, String frequency) {
+    public Recurrence(int numberOfWeeks, LocalTime start, LocalTime end, int dayOfWeek, String frequency) {
         this.recurrenceId = UUID.randomUUID();
         this.numberOfWeeks = numberOfWeeks;
-        this.startSlot = startSlot;
-        this.durationInMinutes = durationInMinutes;
+        this.start = start;
+        this.end = end;
         this.dayOfWeek = dayOfWeek;
         this.frequencyType = FrequencyType.valueOf(frequency);
     }
 
     // ====== BUILDER PATTERN ======
     public static class Builder {
+        private static final LocalTime BUSINESS_START = LocalTime.of(9, 0);
+        private static final LocalTime BUSINESS_END   = LocalTime.of(19, 0);
         // Required fields
         private final int numberOfWeeks;
-        private final int startSlot;
-        private final int durationInMinutes;
+        private final LocalTime start;
+        private final LocalTime end;
+//        private final int durationInMinutes;
         private final int dayOfWeek;
 
         // Optional fields with defaults
@@ -47,14 +54,14 @@ public class Recurrence {
         /**
          * Creates a builder for recurrence with required parameters
          * @param numberOfWeeks Number of weeks to repeat (1-52)
-         * @param startSlot Starting time slot (1-10)
-         * @param durationInMinutes Duration in minutes (1-600)
+         * @param start Starting time
+         * @param end Ending time
          * @param dayOfWeek Day of week (1=Monday, 6=Saturday)
          */
-        public Builder(int numberOfWeeks, int startSlot, int durationInMinutes, int dayOfWeek) {
+        public Builder(int numberOfWeeks, LocalTime start, LocalTime end, int dayOfWeek) {
             this.numberOfWeeks = numberOfWeeks;
-            this.startSlot = startSlot;
-            this.durationInMinutes = durationInMinutes;
+            this.start = start;
+            this.end = end;
             this.dayOfWeek = dayOfWeek;
         }
 
@@ -93,11 +100,17 @@ public class Recurrence {
             if (numberOfWeeks <= 0 || numberOfWeeks > 52) {
                 throw new IllegalArgumentException("Number of weeks must be between 1 and 52, got: " + numberOfWeeks);
             }
-            if (startSlot < 1 || startSlot > 10) {
-                throw new IllegalArgumentException("Start slot must be between 1 and 10, got: " + startSlot);
+            if (start == null || end == null) {
+                throw new IllegalArgumentException("Start and end times must not be null.");
             }
-            if (durationInMinutes <= 0 || durationInMinutes > 600) {
-                throw new IllegalArgumentException("Duration must be between 1 and 600 minutes, got: " + durationInMinutes);
+            if (!start.isBefore(end)) {
+                throw new IllegalArgumentException("Invalid time range: start (" + start + ") must be before end (" + end + ").");
+            }
+            if (start.isBefore(BUSINESS_START)) {
+                throw new IllegalArgumentException("Invalid start time: " + start + " is before business hours (" + BUSINESS_START + ").");
+            }
+            if (end.isAfter(BUSINESS_END)) {
+                throw new IllegalArgumentException("Invalid end time: " + end + " exceeds business hours (" + BUSINESS_END + ").");
             }
             if (dayOfWeek < 1 || dayOfWeek > 6) {
                 throw new IllegalArgumentException("Day of week must be between 1 and 6, got: " + dayOfWeek);
@@ -112,8 +125,8 @@ public class Recurrence {
     public String toString() {
         return "Recurrence{" +
                 "numberOfWeeks=" + numberOfWeeks +
-                ", startSlot=" + startSlot +
-                ", durationInMinutes=" + durationInMinutes +
+                ", startTime=" + start +
+                ", endTime=" + end +
                 ", dayOfWeek=" + dayOfWeek +
                 ", frequencyType=" + frequencyType +
                 '}';

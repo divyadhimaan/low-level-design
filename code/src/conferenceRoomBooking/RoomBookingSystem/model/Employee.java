@@ -32,7 +32,7 @@ public class Employee {
         }
         for(Booking booking: bookings){
             System.out.println("Booking ID: " + booking.getBookingId() + ", Room: " + booking.getRoom().getRoomName() +
-                    ", Slots: " + booking.getBookedSlots() + ", Day: " + booking.getDay() );
+                    ", Time: " + booking.getStartTime() + "–" + booking.getEndTime() + ", Day: " + booking.getDay() );
         }
     }
 

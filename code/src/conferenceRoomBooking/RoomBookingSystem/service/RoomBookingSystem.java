@@ -8,6 +8,7 @@ import RoomBookingSystem.observer.EmailObserver;
 import RoomBookingSystem.observer.CalendarObserver;
 import RoomBookingSystem.observer.SlackObserver;
 
+import java.time.LocalTime;
 import java.util.List;
 
 public class RoomBookingSystem {
@@ -57,17 +58,17 @@ public class RoomBookingSystem {
         orchestrator.showAllRegisteredEmployees();
     }
 
-    public void bookRoom(String employeeName, int totalAttendees, int startSlot, int durationMinutes){
+    public void bookRoom(String employeeName, int totalAttendees, LocalTime start, LocalTime end){
         System.out.println("------------------- Booking Initiated ----------------------- ");
-        orchestrator.bookRoom(employeeName, totalAttendees, startSlot, durationMinutes);
+        orchestrator.bookRoom(employeeName, totalAttendees, start, end);
 
         System.out.println("------------------- Booking Ended ----------------------- ");
     }
 
-    public void bookRoomRecurring(String employeeName, int totalAttendees, int startSlot, int durationMinutes, int numberOfWeeks, int dayOfWeek, String frequencyType) {
+    public void bookRoomRecurring(String employeeName, int totalAttendees, LocalTime start, LocalTime end, int numberOfWeeks, int dayOfWeek, String frequencyType) {
 
         System.out.println("------------------- Booking Initiated ----------------------- ");
-        orchestrator.bookRoom(employeeName, totalAttendees, new Recurrence(numberOfWeeks, startSlot, durationMinutes, dayOfWeek, frequencyType));
+        orchestrator.bookRoom(employeeName, totalAttendees, new Recurrence(numberOfWeeks, start, end, dayOfWeek, frequencyType));
         System.out.println("------------------- Booking Ended ----------------------- ");
 
     }

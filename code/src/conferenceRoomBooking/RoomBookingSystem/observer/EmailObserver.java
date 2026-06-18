@@ -10,13 +10,12 @@ public class EmailObserver implements BookingObserver {
         String emailBody = String.format(
             "Your room booking has been confirmed!%n" +
             "Room: %s%n" +
-            "Time Slot: %s%n" +
-            "Duration: %s minutes%n" +
+            "Time: %s – %s%n" +
             "Day: %d%n" +
             "Booking ID: %s",
             booking.getRoom().getRoomName(),
-            booking.getBookedSlots(),
-            "60",  // Default or calculate from slots
+            booking.getStartTime(),
+            booking.getEndTime(),
             booking.getDay(),
             booking.getBookingId()
         );
@@ -78,8 +77,8 @@ public class EmailObserver implements BookingObserver {
         StringBuilder details = new StringBuilder();
         for (int i = 0; i < bookings.size(); i++) {
             Booking booking = bookings.get(i);
-            details.append(String.format("  %d. Day: %d, Slots: %s%n",
-                i + 1, booking.getDay(), booking.getBookedSlots()));
+            details.append(String.format("  %d. Day: %d, Time: %s – %s%n",
+                i + 1, booking.getDay(), booking.getStartTime(), booking.getEndTime()));
         }
         return details.toString();
     }
