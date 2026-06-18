@@ -8,7 +8,7 @@ import java.time.LocalTime;
 public class PaymentService {
 
     public double calculatePaymentAmount(ParkingLotTicket ticket, PaymentStrategy strategy, LocalTime exitTime) {
-        long duration = java.time.Duration.between(ticket.getEntryTime(), exitTime).toMinutes();
+        long duration = Math.abs(java.time.Duration.between(exitTime, ticket.getEntryTime()).toMinutes());
         System.out.println(duration);
         double amount = strategy.calculate(duration);
         // Process payment with the calculated amount
