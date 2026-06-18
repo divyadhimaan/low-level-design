@@ -1,8 +1,6 @@
 
 import RoomBookingSystem.service.RoomBookingSystem;
-import RoomBookingSystem.observer.EmailObserver;
-import RoomBookingSystem.observer.CalendarObserver;
-import RoomBookingSystem.observer.SlackObserver;
+import RoomBookingSystem.model.Recurrence.Builder;
 
 import java.util.List;
 
@@ -11,22 +9,10 @@ public class RoomBookingSystemSimulation {
 
         RoomBookingSystem bookingRoomSystem = RoomBookingSystem.getInstance();
 
-        // ====== SETUP OBSERVERS ======
         System.out.println("\n╔════════════════════════════════════════╗");
-        System.out.println("║     Setting up Notification Observers   ║");
+        System.out.println("║    Room Booking System Initialized      ║");
+        System.out.println("║    (Observers: Email, Calendar, Slack)  ║");
         System.out.println("╚════════════════════════════════════════╝\n");
-
-        // Get orchestrator and subscribe observers
-        bookingRoomSystem.getOrchestrator().subscribe(new EmailObserver());
-        System.out.println("✅ EmailObserver subscribed");
-
-        bookingRoomSystem.getOrchestrator().subscribe(new CalendarObserver());
-        System.out.println("✅ CalendarObserver subscribed");
-
-        bookingRoomSystem.getOrchestrator().subscribe(new SlackObserver());
-        System.out.println("✅ SlackObserver subscribed");
-
-        System.out.println("\n" + "=".repeat(50) + "\n");
 
         List<Integer> slots1 = List.of(1,2,3,4,5,6,7,8,9,10);
         bookingRoomSystem.registerRoom("Room A", "SMALL", slots1);
@@ -46,13 +32,33 @@ public class RoomBookingSystemSimulation {
 
         bookingRoomSystem.showAllRegisteredEmployees();
 
+        // ====== SINGLE BOOKINGS ======
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║        Creating Single Bookings         ║");
+        System.out.println("╚════════════════════════════════════════╝\n");
+
         bookingRoomSystem.bookRoom("Alice", 7, 2, 30);
         bookingRoomSystem.bookRoom("Bob", 12, 1, 90);
         bookingRoomSystem.bookRoom("Charlie", 3, 1, 90);
         bookingRoomSystem.bookRoom("Alice", 7, 2, 180);
 
-        bookingRoomSystem.bookRoomRecurring("David", 5, 3, 60, 3, 3, "WEEKLY");
-        bookingRoomSystem.bookRoomRecurring("Bob", 13, 7, 30, 2, 1,"DAILY");
+        // ====== RECURRING BOOKINGS WITH BUILDER PATTERN ======
+        System.out.println("\n╔════════════════════════════════════════╗");
+        System.out.println("║      Creating Recurring Bookings        ║");
+        System.out.println("╚════════════════════════════════════════╝\n");
+
+        // Using Builder Pattern for Recurrence - Much more readable!
+        var weeklyRecurrence = new Builder(3, 3, 60, 3)
+                .withFrequency("WEEKLY")
+                .build();
+        System.out.println("📋 Weekly recurrence built: " + weeklyRecurrence);
+        bookingRoomSystem.bookRoomRecurring("David", 5, weeklyRecurrence);
+
+        var dailyRecurrence = new Builder(2, 7, 30, 1)
+                .withFrequency("DAILY")
+                .build();
+        System.out.println("📋 Daily recurrence built: " + dailyRecurrence);
+        bookingRoomSystem.bookRoomRecurring("Bob", 13, dailyRecurrence);
 
         bookingRoomSystem.viewSchedule();
 

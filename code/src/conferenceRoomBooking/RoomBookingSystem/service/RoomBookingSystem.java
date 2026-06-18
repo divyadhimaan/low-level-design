@@ -4,6 +4,9 @@ import RoomBookingSystem.model.Recurrence;
 import RoomBookingSystem.orchestrator.RoomBookingOrchestrator;
 import RoomBookingSystem.repository.EmployeeInventory;
 import RoomBookingSystem.repository.RoomInventory;
+import RoomBookingSystem.observer.EmailObserver;
+import RoomBookingSystem.observer.CalendarObserver;
+import RoomBookingSystem.observer.SlackObserver;
 
 import java.util.List;
 
@@ -14,6 +17,17 @@ public class RoomBookingSystem {
 
     private RoomBookingSystem() {
         this.orchestrator = new RoomBookingOrchestrator(new RoomInventory(), new EmployeeInventory());
+        initializeDefaultObservers();
+    }
+
+    /**
+     * Initialize default observers for the system
+     * Can be customized or replaced by calling getOrchestrator().subscribe() methods
+     */
+    private void initializeDefaultObservers() {
+        orchestrator.subscribe(new EmailObserver());
+        orchestrator.subscribe(new CalendarObserver());
+        orchestrator.subscribe(new SlackObserver());
     }
 
     public static synchronized RoomBookingSystem getInstance()
@@ -56,6 +70,12 @@ public class RoomBookingSystem {
         orchestrator.bookRoom(employeeName, totalAttendees, new Recurrence(numberOfWeeks, startSlot, durationMinutes, dayOfWeek, frequencyType));
         System.out.println("------------------- Booking Ended ----------------------- ");
 
+    }
+
+    public void bookRoomRecurring(String employeeName, int totalAttendees, Recurrence recurrence) {
+        System.out.println("------------------- Booking Initiated ----------------------- ");
+        orchestrator.bookRoom(employeeName, totalAttendees, recurrence);
+        System.out.println("------------------- Booking Ended ----------------------- ");
     }
 
     public void viewSchedule(){
