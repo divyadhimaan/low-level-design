@@ -4,7 +4,7 @@
 
 | Entity              | Type                      | Purpose                                                                                                                   |
 |---------------------|---------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `LoggingManager`    | Class (Singleton)         | Central orchestrator. Maintains logger registry, root logger, async processor, and manages shutdown lifecycle.            |
+| `LoggingManager`    | Class (Singleton)         | Central facade. Maintains logger registry, root logger, async processor, and manages shutdown lifecycle.            |
 | `Logger`            | Class                     | Core logging unit. Performs level filtering, maintains hierarchy, holds appenders, and delegates async processing.        |
 | `AsyncLogProcessor` | Class                     | Handles asynchronous log execution using a single-threaded `ExecutorService` to ensure non-blocking, ordered log writing. |
 | `LogMessage`        | Class (Immutable Model)   | Represents a single log event containing level, timestamp, logger name, and message.                                      |

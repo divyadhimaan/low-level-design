@@ -6,7 +6,7 @@ out/
 .idea
 .idea/low-level-design.iml
 
-target/
+target/*
 *.iml
 ### Eclipse ###
 .apt_generated

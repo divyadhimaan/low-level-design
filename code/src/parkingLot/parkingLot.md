@@ -2,53 +2,52 @@
 
 ## Components Used
 
-1. `ParkingLot`: Manages multiple levels and parking spots, assigns and releases spots, tracks availability.
-    - `getInstance()`: Returns a singleton instance of the parking lot.
-    - `addLevel(ParkingLevel level)`: Adds a parking level to the parking lot.
-    - `getTicketById(String ticketId)`: Retrieves a parking ticket by its ID.
-    - `findAvailableSpot(VehicleType vehicleType)`: Finds an available parking spot based on the vehicle type.
+1. `ParkingLot` (facade): Facade over the entire system — manages levels, spot assignment, ticketing, and payment.
+    - `getInstance(PaymentStrategy, int levels)`: Returns the singleton instance, initializing levels on first call.
+    - `initializeLevels(int totalLevels)`: Creates parking levels with a default set of spots (2 bike, 3 car, 1 truck per level).
+    - `entry(Vehicle vehicle, LocalTime entryTime)`: Finds a spot, occupies it, issues and stores a ticket.
+    - `exit(Vehicle vehicle, LocalTime exitTime, UUID ticketId)`: Retrieves ticket, calculates fee, processes payment.
+    - `findAvailableSpot(VehicleType vehicleType)`: Scans levels for an unoccupied compatible spot.
 
-2. `ParkingLevel`: Represents a level in the parking lot, contains a set of parking spots.
-    - `findParkingSpot(VehicleType type)`: Finds an available parking spot that matches the vehicle type (car, bike, truck).
-    - `isFull()`: Checks if the level is fully occupied (returns true if all spots are occupied).
+2. `ParkingLevel`: Represents a floor in the parking lot, holds a list of parking spots.
+    - `findParkingSpot(VehicleType type)`: Returns the first unoccupied spot compatible with the vehicle type.
+    - `isFull()`: Returns true if every spot on this level is occupied.
 
-3. `ParkingSpot`: Represents an individual parking spot, tracks availability and the type of vehicle it can accommodate.
-    - `occupySpot(Vehicle vehicle)`: Marks the spot as occupied and assigns a vehicle.
-    - `vacateSpot()`: Frees the parking spot and clears the vehicle.
+3. `ParkingSpot`: Represents an individual spot, tracks occupancy and spot type.
+    - `occupySpot(Vehicle vehicle)`: Marks the spot occupied and records the vehicle.
+    - `vacateSpot()`: Clears the vehicle and marks the spot free.
 
-4. `Vehicle` (Abstract Class): Abstract class representing vehicles (e.g., Vehicle.Car, Motorcycle, Vehicle.Truck).
-    - `getVehicleType()`: Returns the vehicle type (car, bike, truck).
-    - `getLicenseNumber()`: Returns the vehicle's license plate number.
+4. `Vehicle` (Abstract Class): Base class for all vehicle types.
+    - `getVehicleType()`: Returns the vehicle type enum (CAR, BIKE, TRUCK).
+    - `getLicenseNumber()`: Returns the license plate.
 
-5. `Car`, `Bike`, `Truck` (Concrete Classes): Represent specific types of vehicles (car, bike, truck), extend the Vehicle class.
-    - Inherits all methods from the Vehicle class
+5. `Car`, `Bike`, `Truck`: Concrete vehicle types, each passing the appropriate `VehicleType` to the parent constructor.
 
-6. `ParkingLotTicket`: Issues a ticket when a vehicle is parked, keeps track of entry time and parking spot.
-    - `getTicketId()`: Retrieves the ticket ID.
-    - `getVehicle()`: Retrieves the vehicle associated with the ticket.
-    - `getParkingSpot()`: Retrieves the parking spot associated with the ticket.
-    - `getEntryTime()`: Retrieves the entry time when the ticket was issued.
+6. `ParkingLotTicket`: Immutable ticket issued on entry, built via an inner Builder.
+    - Fields: `ticketId` (auto-generated UUID), `vehicle`, `parkingSpot`, `entryTime`.
+    - `ParkingLotTicket.Builder`: Fluent builder; generates `ticketId` in `build()` and validates required fields.
 
-7. `EntryGate`: Handles vehicle entry, assigns available spots, and issues tickets.
-    - `entry(Vehicle vehicle)`: Issues a parking ticket for the vehicle entering the parking lot.
-    - `issueTicket(Vehicle vehicle)`: Finds an available parking spot and issues a ticket.
-    - `assignParkingSpot(ParkingSpot availableSpot, Vehicle vehicle)`: Assigns a vehicle to a parking spot.
+7. `TicketInventory` (repository): Thread-safe store for active tickets.
+    - `addTicket(ParkingLotTicket)`: Stores a ticket keyed by its UUID.
+    - `getTicketById(UUID)`: Retrieves a ticket by ID.
 
-8. `ExitGate`: Handles vehicle exit, calculates fees, releases parking spots, and processes payments.
-    - `exit(String ticketId)`: Handles vehicle exit, calculates the parking fee, and releases the spot.
-    - `calculateFee(long duration)`: Calculates the parking fee based on the duration of stay.
+8. `PaymentService`: Handles fee calculation and payment processing.
+    - `calculatePaymentAmount(ticket, strategy, exitTime)`: Computes duration in minutes and delegates to the strategy.
+    - `processPayment(amount, ticket)`: Simulates payment processing.
 
-9. `PaymentProcessor`: Handles parking fee calculations and payments.
-    - `setStrategy(PaymentStrategy strategy)`: Sets the payment strategy (e.g., hourly, per minute).
-    - `calculateStrategy(long duration)`: Calculates the parking fee based on the strategy.
-   
+9. `PaymentStrategy` (interface): Defines the pricing contract.
+    - `HourlyPaymentStrategy`: Charges $2.00/hour, rounding up partial hours.
+    - `MinutePaymentStrategy`: Charges $0.05/minute.
+
 ## Patterns Used
 
-- `ParkingLot` uses singleton method:  The system should have only one instance of the parking lot that manages the entire structure.
-- `PaymentProcessor` uses strategy.Strategy pattern: Different parking lots may have different pricing models.
-- `ParkingDisplay` uses Observer pattern: Real-time update of parking space availability.
-- `EntryGate` and `ExitGate` uses command pattern: To handle parking entry and exit as commands for scalability.
-- To handle `concurreny` used synchronized methods: To handle multiple entry and exit points
+- **Singleton** — `ParkingLot` has a single shared instance via `synchronized getInstance()`, ensuring one lot manages the whole structure.
+- **Facade** — `ParkingLot` (in the `facade` package) hides the complexity of levels, spots, ticketing, and payment behind simple `entry()` and `exit()` methods.
+- **Strategy** — `PaymentStrategy` interface with `HourlyPaymentStrategy` and `MinutePaymentStrategy` allows pricing models to be swapped without changing core logic.
+- **Builder** — `ParkingLotTicket.Builder` constructs immutable tickets with a fluent API, auto-generating the UUID in `build()`.
+- **Repository** — `TicketInventory` abstracts ticket storage and lookup, keeping persistence concerns out of the facade.
+- **Template Method / Inheritance** — `Vehicle` is abstract; `Car`, `Bike`, and `Truck` extend it, supplying only their specific `VehicleType`.
+- **Concurrency** — `TicketInventory` uses `ConcurrentHashMap` with `synchronized` methods to safely handle concurrent entry/exit operations.
 
 
 

@@ -1,16 +1,19 @@
-import Vehicle.Vehicle;
-import Vehicle.Car;
+import model.ParkingLotTicket;
+import model.Vehicle;
+import model.Car;
+import facade.ParkingLot;
+import strategy.HourlyPaymentStrategy;
+
+import java.time.LocalTime;
 
 public class ParkingLotDemo {
     public static void main(String[] args)
     {
-        ParkingLot parkingLot = ParkingLot.getInstance(new HourlyPaymentStrategy());
+        ParkingLot parkingLot = ParkingLot.getInstance(new HourlyPaymentStrategy(), 4);
 
-        EntryGate entryGate = new EntryGate(parkingLot);
-        ExitGate exitGate = new ExitGate(parkingLot);
 
         Vehicle car = new Car("KA-01-AB-1234");
-        ParkingLotTicket ticket = entryGate.entry(car);
+        ParkingLotTicket ticket = parkingLot.entry(car, LocalTime.now());
 
         if (ticket != null) {
             try {
@@ -18,7 +21,7 @@ public class ParkingLotDemo {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            exitGate.exit(ticket.getTicketId());
+            parkingLot.exit(LocalTime.now().plusHours(12), ticket.getTicketId());
         }
     }
 }

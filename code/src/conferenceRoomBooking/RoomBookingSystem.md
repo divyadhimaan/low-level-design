@@ -33,7 +33,7 @@ This Room Booking System is a comprehensive, production-ready application that a
 
 | Entity | Responsibilities | Key Attributes | Thread-Safe |
 |--------|---|---|---|
-| `RoomBookingSystem` | Facade/Singleton entry point | `systemInstance`, `orchestrator` | ✅ |
+| `RoomBookingSystem` | Facade/Singleton entry point | `systemInstance`, `facade` | ✅ |
 | `RoomBookingOrchestrator` | Core business logic, orchestrates workflows | `roomInventory`, `employeeInventory`, `roomSelectionStrategy`, `recurringRoomSelectionStrategy` | ✅ |
 | `RoomInventory` | Stores rooms, query methods | `ConcurrentHashMap<RoomType, ConcurrentHashMap<String, Room>>` | ✅ |
 | `EmployeeInventory` | Stores employees, lookup methods | `ConcurrentHashMap<UUID, Employee>` | ✅ |
@@ -223,13 +223,13 @@ public synchronized void viewEmployeeBookings()
 
 ### Strategy Usage
 ```java
-RoomBookingOrchestrator orchestrator = new RoomBookingOrchestrator(...);
+RoomBookingOrchestrator facade = new RoomBookingOrchestrator(...);
 
 // Switch single booking strategy
-orchestrator.setRoomSelectionStrategy(new FirstAvailableStrategy());
+facade.setRoomSelectionStrategy(new FirstAvailableStrategy());
 
 // Switch recurring booking strategy
-orchestrator.setRecurringRoomSelectionStrategy(
+facade.setRecurringRoomSelectionStrategy(
     new LargestAvailableRecurringStrategy()
 );
 ```
@@ -301,12 +301,12 @@ Booking ID: <UUID>
 
 **Subscribe Observers:**
 ```java
-RoomBookingOrchestrator orchestrator = new RoomBookingOrchestrator(...);
+RoomBookingOrchestrator facade = new RoomBookingOrchestrator(...);
 
 // Register observers
-orchestrator.subscribe(new EmailObserver());
-orchestrator.subscribe(new CalendarObserver());
-orchestrator.subscribe(new SlackObserver());
+facade.subscribe(new EmailObserver());
+facade.subscribe(new CalendarObserver());
+facade.subscribe(new SlackObserver());
 
 // Now all observers will be notified on booking events
 system.bookRoom("John Doe", 5, 9, 60);
@@ -316,9 +316,9 @@ system.bookRoom("John Doe", 5, 9, 60);
 **Unsubscribe Observers:**
 ```java
 BookingObserver emailObserver = new EmailObserver();
-orchestrator.subscribe(emailObserver);
+facade.subscribe(emailObserver);
 // ... later ...
-orchestrator.unsubscribe(emailObserver);  // Stop notifications
+facade.unsubscribe(emailObserver);  // Stop notifications
 ```
 
 ### How It Works
@@ -367,7 +367,7 @@ public class SMSObserver implements BookingObserver {
 }
 
 // Register it
-orchestrator.subscribe(new SMSObserver());
+facade.subscribe(new SMSObserver());
 ```
 
 ---
@@ -573,13 +573,13 @@ system.registerEmployee("Jane Smith", "Marketing");
 ```java
 // You can add additional observers or replace default ones
 RoomBookingSystem system = RoomBookingSystem.getInstance();
-RoomBookingOrchestrator orchestrator = system.getOrchestrator();
+RoomBookingOrchestrator facade = system.getOrchestrator();
 
 // Add additional observer
-orchestrator.subscribe(new SMSObserver());
+facade.subscribe(new SMSObserver());
 
 // Or unsubscribe from default observers if needed
-// orchestrator.unsubscribe(emailObserver);
+// facade.unsubscribe(emailObserver);
 ```
 
 ### Single Booking (Default Strategy)
@@ -589,8 +589,8 @@ system.bookRoom("John Doe", 5, 9, 60);  // BestFitStrategy
 
 ### Single Booking (Custom Strategy)
 ```java
-RoomBookingOrchestrator orchestrator = system.getInstance().orchestrator;
-orchestrator.setRoomSelectionStrategy(new FirstAvailableStrategy());
+RoomBookingOrchestrator facade = system.getInstance().facade;
+facade.setRoomSelectionStrategy(new FirstAvailableStrategy());
 system.bookRoom("Jane Smith", 15, 10, 120);
 ```
 
@@ -602,7 +602,7 @@ system.bookRoomRecurring("John Doe", 8, 9, 60, 4, 2, "WEEKLY");
 
 ### Recurring Booking (Custom Strategy)
 ```java
-orchestrator.setRecurringRoomSelectionStrategy(
+facade.setRecurringRoomSelectionStrategy(
     new LargestAvailableRecurringStrategy()
 );
 system.bookRoomRecurring("Jane Smith", 20, 10, 120, 6, 3, "WEEKLY");
@@ -617,7 +617,7 @@ var weeklyMeeting = new Recurrence.Builder(4, 9, 60, 3)
 system.bookRoomRecurring("John Doe", 8, weeklyMeeting);
 
 // With custom strategy
-orchestrator.setRecurringRoomSelectionStrategy(
+facade.setRecurringRoomSelectionStrategy(
     new FirstAvailableRecurringStrategy()
 );
 
@@ -644,7 +644,7 @@ classDiagram
     %% ============================================
     class RoomBookingSystem {
         -systemInstance : RoomBookingSystem
-        -orchestrator : RoomBookingOrchestrator
+        -facade : RoomBookingOrchestrator
         +getInstance()* RoomBookingSystem
         +registerRoom(String, String, List<Integer>)
         +registerEmployee(String, String)
@@ -928,7 +928,7 @@ RoomBookingSystem/
 │   └── EmployeeInventory.java
 ├── service/
 │   └── RoomBookingSystem.java
-├── orchestrator/
+├── facade/
 │   └── RoomBookingOrchestrator.java
 ├── strategy/
 │   ├── RoomStrategy.java
