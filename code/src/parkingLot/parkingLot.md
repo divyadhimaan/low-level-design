@@ -23,19 +23,22 @@
 
 5. `Car`, `Bike`, `Truck`: Concrete vehicle types, each passing the appropriate `VehicleType` to the parent constructor.
 
-6. `ParkingLotTicket`: Immutable ticket issued on entry, built via an inner Builder.
-    - Fields: `ticketId` (auto-generated UUID), `vehicle`, `parkingSpot`, `entryTime`.
+6. `ParkingLotTicket`: Ticket issued on entry, built via an inner Builder. Tracks lifecycle via status.
+    - Fields: `ticketId` (auto-generated UUID), `vehicle`, `parkingSpot`, `entryTime`, `status`.
+    - `status` is initialized to `ACTIVE` on creation and updated to `COMPLETED` on exit via `markCompleted()`.
     - `ParkingLotTicket.Builder`: Fluent builder; generates `ticketId` in `build()` and validates required fields.
 
-7. `TicketInventory` (repository): Thread-safe store for active tickets.
+7. `TicketStatus`: Enum representing ticket lifecycle — `ACTIVE` (vehicle parked) and `COMPLETED` (vehicle exited, payment processed).
+
+8. `TicketInventory` (repository): Thread-safe store for tickets (active and completed).
     - `addTicket(ParkingLotTicket)`: Stores a ticket keyed by its UUID.
     - `getTicketById(UUID)`: Retrieves a ticket by ID.
 
-8. `PaymentService`: Handles fee calculation and payment processing.
+9. `PaymentService`: Handles fee calculation and payment processing.
     - `calculatePaymentAmount(ticket, strategy, exitTime)`: Computes duration in minutes and delegates to the strategy.
     - `processPayment(amount, ticket)`: Simulates payment processing.
 
-9. `PaymentStrategy` (interface): Defines the pricing contract.
+10. `PaymentStrategy` (interface): Defines the pricing contract.
     - `HourlyPaymentStrategy`: Charges $2.00/hour, rounding up partial hours.
     - `MinutePaymentStrategy`: Charges $0.05/minute.
 
@@ -56,7 +59,7 @@
 - **`LocalTime` instead of `LocalDateTime`** — stays crossing midnight produce incorrect durations. `Math.abs` masks the issue. Fix: use `LocalDateTime` or `Instant` for entry/exit times.
 - **`MinutePaymentStrategy` bug** — divides duration by `1000 * 60` (milliseconds denominator) but receives minutes from `PaymentService`. Should use `duration` directly.
 - **`ParkingLotTicket` constructor is `public`** — should be `private` to enforce creation exclusively through the Builder.
-- **Ticket not removed from inventory on exit** — processed tickets remain in `TicketInventory` indefinitely. `exit()` should call `ticketInventory.removeTicket(ticketId)` after payment.
+- **Tickets kept in inventory after exit** — tickets are marked `COMPLETED` but remain in `TicketInventory`. Acceptable for audit purposes; a production system would archive or purge old records periodically.
 - **`exit()` not synchronized** — a spot is vacated outside any lock, which can race with a concurrent `entry()` finding that spot mid-vacate. Wrap `vacateSpot()` in a `synchronized (this)` block.
 - **`PaymentProcessor.java` in root** — stale unused file leftover from earlier iteration, should be deleted.
 
@@ -127,6 +130,14 @@ classDiagram
         -Vehicle vehicle
         -ParkingSpot parkingSpot
         -LocalTime entryTime
+        -TicketStatus status
+        +markCompleted() void
+    }
+
+    class TicketStatus {
+        <<enumeration>>
+        ACTIVE
+        COMPLETED
     }
 
     class Builder {
@@ -181,6 +192,7 @@ classDiagram
     ParkingLotTicket --> Vehicle
     ParkingLotTicket --> ParkingSpot
     ParkingLotTicket *-- Builder
+    ParkingLotTicket --> TicketStatus
     TicketInventory --> ParkingLotTicket
     PaymentStrategy <|.. HourlyPaymentStrategy
     PaymentStrategy <|.. MinutePaymentStrategy

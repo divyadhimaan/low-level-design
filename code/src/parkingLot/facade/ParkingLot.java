@@ -87,6 +87,8 @@ public class ParkingLot {
         synchronized (this) {
             ticket.getParkingSpot().vacateSpot();
         }
+
+        ticket.markCompleted();
     }
 
     public ParkingSpot findAvailableSpot(VehicleType vehicleType)

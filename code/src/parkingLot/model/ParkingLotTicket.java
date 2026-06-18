@@ -11,13 +11,18 @@ public class ParkingLotTicket {
     private final Vehicle vehicle;
     private final ParkingSpot parkingSpot;
     private final LocalTime entryTime;
-    private final String status;
+    private TicketStatus status;
 
     private ParkingLotTicket(Builder builder) {
         this.ticketId = builder.ticketId;
         this.vehicle = builder.vehicle;
         this.parkingSpot = builder.parkingSpot;
         this.entryTime = builder.entryTime;
+        this.status = TicketStatus.ACTIVE;
+    }
+
+    public void markCompleted() {
+        this.status = TicketStatus.COMPLETED;
     }
 
     public static class Builder {
