@@ -1,6 +1,11 @@
 
 import RoomBookingSystem.service.RoomBookingSystem;
+import RoomBookingSystem.model.Recurrence;
 import RoomBookingSystem.model.Recurrence.Builder;
+import RoomBookingSystem.observer.BookingObserver;
+import RoomBookingSystem.observer.EmailObserver;
+import RoomBookingSystem.observer.CalendarObserver;
+import RoomBookingSystem.observer.SlackObserver;
 
 import java.util.List;
 
