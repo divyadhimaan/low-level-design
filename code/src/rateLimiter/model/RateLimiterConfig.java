@@ -1,3 +1,8 @@
+package model;
+
+import lombok.Getter;
+
+@Getter
 public class RateLimiterConfig {
     private final int maxRequests;      // requests allowed per window
     private final long windowSizeMs;    // window duration in ms
@@ -9,7 +14,7 @@ public class RateLimiterConfig {
         this.bucketCapacity = builder.bucketCapacity;
     }
 
-    public static class Builder{
+    public static class Builder {
 
         private int maxRequests = 100;      // default
         private long windowSizeMs = 60000;  // default 1 minute

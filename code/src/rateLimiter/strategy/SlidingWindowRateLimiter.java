@@ -1,9 +1,15 @@
 package strategy;
 
-public class SlidingWindowRateLimiter implements RateLimiterStrategy{
+import model.RateLimiterConfig;
+
+public class SlidingWindowRateLimiter implements RateLimiterStrategy {
+
+    public SlidingWindowRateLimiter(RateLimiterConfig config) {
+    }
+
     @Override
     public boolean isAllowed(String clientId, RateLimiterConfig config) {
-        // Implement fixed window rate limiting logic here
+        // TODO: implement sliding window logic
         return false;
     }
 }

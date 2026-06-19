@@ -1,3 +1,5 @@
+package model;
+
 public enum Strategy {
     FIXED_WINDOW,
     SLIDING_WINDOW,

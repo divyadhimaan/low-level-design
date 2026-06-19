@@ -1,3 +1,6 @@
+import model.RateLimiterConfig;
+import model.Strategy;
+
 public class RateLimiterDemo {
 
     public static void main(String[] args) {
