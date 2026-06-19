@@ -9,17 +9,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class FixedWindowRateLimiter implements RateLimiterStrategy {
 
     private final Map<String, Integer> requestCounts = new ConcurrentHashMap<>();
-    private final Map<String, LocalDateTime> windowStartTimes = new ConcurrentHashMap<>();
+    private final Map<String, Long> windowStartTimes = new ConcurrentHashMap<>();
 
     public FixedWindowRateLimiter(RateLimiterConfig config) {
     }
 
     @Override
     public boolean isAllowed(String clientId, RateLimiterConfig config) {
-        LocalDateTime currTime = LocalDateTime.now();
-        LocalDateTime windowStartTime = windowStartTimes.getOrDefault(clientId, currTime);
+        long currTime = System.currentTimeMillis();
+        long windowStartTime = windowStartTimes.getOrDefault(clientId, currTime);
 
-        if(currTime - windowStartTime > config.getWindowSizeMs()){
+        if(currTime - windowStartTime >= config.getWindowSizeMs()){
             requestCounts.put(clientId, 1);
             windowStartTimes.put(clientId, currTime);
             return true;
