@@ -86,6 +86,7 @@ SOLID is an acronym for five fundamental principles of object-oriented programmi
 - [Design a PubSub Model](./problems/pub-sub-model.md)
 - [Design a Tic Tac Toe Game](./problems/tic-tac-toe-game.md)
 - [Design a Library Management System](./problems/library-management-system.md)
+- [Design a Notification System](./problems/notification-service.md)
 
 ### Hard Problems
 - [Design an Elevator System](./problems/elevator-system.md)
