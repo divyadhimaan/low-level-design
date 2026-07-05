@@ -66,6 +66,7 @@ public class RunnableDemo {
 }
 ```
 Same `task` object works whether it's driven by a raw `Thread` or a pool — that's the decoupling benefit in action.
+Refer [this](03a-raw-thread-vs-executorservice.md) for more details on `ExecutorService`.
 
 ### 3c. Implement `Callable<V>`, submit to an `ExecutorService`
 

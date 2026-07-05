@@ -95,6 +95,16 @@ SOLID is an acronym for five fundamental principles of object-oriented programmi
 - [Design a Movie Ticket Booking System](./problems/movie-ticket-booking-system.md)
 - [Design Music Streaming Service](./problems/spotify.md)
 
+## Concurrency
+Notes built topic-by-topic for deep concurrency prep (Java), each with mental models, Java specifics, interview gotchas, and a self-check.
+
+
+0. [Glossary](./concepts/concurrency/00-glossary.md) — quick-reference definitions: Checked Exceptions, Unchecked Exceptions, Future, ExecutorService.
+1. [Process vs Thread · Concurrency vs Parallelism](./concepts/concurrency/01-process-vs-thread-concurrency-vs-parallelism.md) — what's shared (heap, metaspace, fds) vs per-thread (stack, PC, registers); why thread context switches are cheaper than process ones; Rob Pike's concurrency-is-structure/parallelism-is-execution framing; races are a concurrency problem, not a parallelism problem.
+2. [Thread Lifecycle & States](./concepts/concurrency/02-thread-lifecycle-states.md) — `NEW`/`RUNNABLE`/`BLOCKED`/`WAITING`/`TIMED_WAITING`/`TERMINATED`; which calls cause which transitions; `sleep()` vs `wait()`; why `notify()` moves a thread to `BLOCKED` first, not `RUNNABLE`; interrupt semantics per state.
+3. [Thread vs Runnable vs Callable](./concepts/concurrency/03-thread-vs-runnable-vs-callable.md) — composition over inheritance for task creation; return values and checked exceptions; `run()` vs `start()`; silent exception swallowing with `submit()` vs `execute()`; code samples for all three creation approaches plus the `FutureTask` bridge.
+    - [3a. Raw Thread vs ExecutorService](./concepts/concurrency/03a-raw-thread-vs-executorservice.md) — thread reuse and bounded concurrency in a pool; the "forgot to `shutdown()`" JVM-hang gotcha; `shutdown()` vs `shutdownNow()` vs `awaitTermination()`.
+    - [3b. Future vs ExecutorService.submit(...)](./concepts/concurrency/03b-future-vs-executorservice-submit.md) — the three `submit()` overloads; `get()`/`get(timeout)`/`isDone()`/`cancel()`; cancellation is cooperative, not forced; why `CompletableFuture` exists; `Future` vs `FutureTask`.
 
 
 ## Notations
