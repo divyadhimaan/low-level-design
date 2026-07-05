@@ -48,23 +48,29 @@ A: **Yes.** Preemption mid-operation causes the same lost-update race as on mult
 
 ## 3. Rapid-fire interview Q&A
 
-**Q: What's shared between threads in the same JVM, and what isn't?**
-A: Shared: heap, metaspace/method area (static fields, class metadata), open file descriptors/sockets. Not shared: stack, PC register, `ThreadLocal` values.
+> **Q: What's shared between threads in the same JVM, and what isn't?**
+> 
+> A: Shared: heap, metaspace/method area (static fields, class metadata), open file descriptors/sockets. Not shared: stack, PC register, `ThreadLocal` values.
 
-**Q: Why is a thread called a "lightweight process"?**
-A: It has its own execution context (stack, PC, registers) like a process, but reuses the parent process's address space instead of getting its own — so creation and context-switching are cheaper.
+> **Q: Why is a thread called a "lightweight process"?**
+> 
+> A: It has its own execution context (stack, PC, registers) like a process, but reuses the parent process's address space instead of getting its own — so creation and context-switching are cheaper.
 
-**Q: Why is a thread context switch cheaper than a process context switch?**
-A: No address space change — the MMU doesn't need to remap page tables or flush the TLB. Only the stack pointer, PC, and register set need to be swapped.
+> **Q: Why is a thread context switch cheaper than a process context switch?**
+>
+> A: No address space change — the MMU doesn't need to remap page tables or flush the TLB. Only the stack pointer, PC, and register set need to be swapped.
 
-**Q: Can you have concurrency without parallelism? Give an example.**
-A: Yes — single-core CPU running a multitasking OS; threads are interleaved via time-slicing but never literally simultaneous.
+> **Q: Can you have concurrency without parallelism? Give an example.**
+>
+> A: Yes — single-core CPU running a multitasking OS; threads are interleaved via time-slicing but never literally simultaneous.
 
-**Q: Does more threads always mean more throughput?**
-A: No — bounded by number of cores, contention on shared resources (locks, memory bandwidth), and Amdahl's Law (speedup is capped by the serial portion of the work that can't be parallelized).
+> **Q: Does more threads always mean more throughput?**
+>
+> A: No — bounded by number of cores, contention on shared resources (locks, memory bandwidth), and Amdahl's Law (speedup is capped by the serial portion of the work that can't be parallelized).
 
-**Q: If a thread throws an uncaught exception, does the JVM crash?**
-A: No, only that thread dies (its default `UncaughtExceptionHandler` logs it) — unless it was the last non-daemon thread keeping the JVM alive. Contrast with heap corruption/OOM, which is process-wide since the heap is shared.
+> **Q: If a thread throws an uncaught exception, does the JVM crash?**
+> 
+> A: No, only that thread dies (its default `UncaughtExceptionHandler` logs it) — unless it was the last non-daemon thread keeping the JVM alive. Contrast with heap corruption/OOM, which is process-wide since the heap is shared.
 
 ## 4. Common misconceptions
 
