@@ -35,7 +35,7 @@ t.setDaemon(true); // IllegalThreadStateException — too late, already started
 
 ## 4. Direct tie-in: why forgetting `ExecutorService.shutdown()` hangs the JVM
 
-This is the mechanism behind the gotcha in [03a](./03a-raw-thread-vs-executorservice.md). `Executors`' default `ThreadFactory` creates **non-daemon** worker threads. An idle pool worker blocked on the internal task queue is a live non-daemon thread — it keeps the JVM alive indefinitely until `shutdown()` is called.
+This is the mechanism behind the gotcha in [03a](03a-raw-thread-vs-executorservice.md). `Executors`' default `ThreadFactory` creates **non-daemon** worker threads. An idle pool worker blocked on the internal task queue is a live non-daemon thread — it keeps the JVM alive indefinitely until `shutdown()` is called.
 
 If you supply a custom `ThreadFactory` that marks pool threads as daemon instead, forgetting `shutdown()` no longer hangs the JVM — but now you lose the guarantee that in-flight/queued tasks finish before the process exits. This is a genuine trade-off, not just a bug to avoid: daemon pool threads sacrifice graceful completion for exit-safety.
 

@@ -1,4 +1,4 @@
-r# Race Conditions & Critical Sections
+# Race Conditions & Critical Sections
 
 Where the guarantees from [06](./06-visibility-atomicity-ordering.md) turn into an actual debugging skill: finding the shared mutable state, and sizing the lock to the invariant, not to a single field.
 

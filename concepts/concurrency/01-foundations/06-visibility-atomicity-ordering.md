@@ -10,7 +10,7 @@ The lens for the rest of concurrency. Every **safety** bug (races, stale reads, 
 
 An operation is atomic if no other thread can observe it "half done." Simple reads/writes of most primitives are atomic — compound operations are not.
 
-`count++` looks like one instruction; it's actually three: read, increment, write. Two threads can interleave between those steps and lose an update — no second core required (see [01](./01-process-vs-thread-concurrency-vs-parallelism.md), preemption alone is enough). Check-then-act (`if (!map.containsKey(k)) map.put(k, v)`) has the same disease.
+`count++` looks like one instruction; it's actually three: read, increment, write. Two threads can interleave between those steps and lose an update — no second core required (see [01](01-process-vs-thread-concurrency-vs-parallelism.md), preemption alone is enough). Check-then-act (`if (!map.containsKey(k)) map.put(k, v)`) has the same disease.
 
 **Subtlety:** `long`/`double` reads/writes are **not guaranteed atomic** by the JLS unless `volatile` — a 64-bit value could theoretically be written as two 32-bit half-writes ("word tearing"), letting a reader see half old / half new. Rare in practice on modern 64-bit JVMs, but only spec-guaranteed atomic with `volatile`.
 
