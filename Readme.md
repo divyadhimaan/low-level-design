@@ -124,6 +124,7 @@ Classic multithreading interview problems,each with a `problem.md` (problem stat
 - [Print Zero-Odd-Even](./code/multithreading/ZeroOddEven/problem.md)
 - [Print FooBar Alternately](./code/multithreading/FooBar/problem.md)
 - [Dining Philosophers](./code/multithreading/DiningPhilosophers/problem.md)
+- [Building H2O](./code/multithreading/BuildingH2O/problem.md)
 
 ## Notations
 - Is-A (Inheritance)
