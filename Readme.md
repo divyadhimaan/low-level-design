@@ -115,6 +115,16 @@ Notes built topic-by-topic for deep concurrency prep (Java), each with mental mo
 
 1. [Race Conditions & Critical Sections](concepts/concurrency/02-core-synchronization/11-race-conditions-critical-sections.md) — race condition vs the stricter "data race"; read-modify-write vs check-then-act (TOCTOU); finding the shared mutable state; sizing a critical section to the invariant, not a single field (the account-transfer example); lock-consistency and the `synchronized(new Object())` fake fix; preferring atomic compound ops like `computeIfAbsent` over hand-rolled check-then-act.
 
+### Coding Problems
+Classic multithreading interview problems,each with a `problem.md` (problem statement, think-through prompts, and a walkthrough of the solution) plus working Java implementations.
+
+- [Bounded Blocking Queue (Producer-Consumer)](./code/multithreading/BlockingQueue/problem.md)
+- [Print in Order](./code/multithreading/PrintInOrder/problem.md)
+- [Round Robin Print](./code/multithreading/RoundRobinPrint/problem.md)
+- [Print Zero-Odd-Even](./code/multithreading/ZeroOddEven/problem.md)
+- [Print FooBar Alternately](./code/multithreading/FooBar/problem.md)
+- [Dining Philosophers](./code/multithreading/DiningPhilosophers/problem.md)
+
 ## Notations
 - Is-A (Inheritance)
 - Has-A (Composition/Aggregation)
