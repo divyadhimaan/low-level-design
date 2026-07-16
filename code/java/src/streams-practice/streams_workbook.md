@@ -93,12 +93,19 @@ List<String> result = words.stream()
 **Exercises**
 
 1.1  From `nums`, return a list of only the even numbers.
+
 1.2  From `nums`, return each number squared.
+
 1.3  From `words`, return the length of each word (as `List<Integer>`).
+
 1.4  From `words`, return words that start with a vowel.
+
 1.5  From `orders`, return the client name of every order (duplicates OK).
+
 1.6  From `employees`, return names of all employees in the "Eng" department.
+
 1.7  From `nums`, return even numbers, each multiplied by 10 (combine filter + map).
+
 1.8  From `orders`, return the total value (`quantity * price`) of each order as `List<Double>`.
 
 ---
@@ -129,14 +136,23 @@ String top = employees.stream()
 **Exercises**
 
 2.1  Count how many words have length > 4.
+
 2.2  Does any employee earn more than 130000? (boolean)
+
 2.3  Are all orders for a positive quantity? (boolean)
+
 2.4  Find the first word starting with "c" (Optional, handle absent).
+
 2.5  Find the employee with the highest salary (the whole `Employee`, Optional).
+
 2.6  Find the youngest employee's name (min by age), fallback "none".
+
 2.7  Sum of all quantities across all orders (use `mapToInt`).
+
 2.8  Average salary across all employees (use `mapToInt` + `average`, handle empty).
+
 2.9  The max word length in `words`.
+
 2.10 Print each number in `nums` on its own line (forEach).
 
 ---
@@ -168,14 +184,23 @@ List<String> top3 = employees.stream()
 **Exercises**
 
 3.1  Sort `nums` ascending into a list.
+
 3.2  Sort `nums` descending into a list.
+
 3.3  From `orders`, the distinct stock symbols.
+
 3.4  From `words`, sort by length (shortest first).
+
 3.5  From `words`, sort by length, then alphabetically for ties (thenComparing).
+
 3.6  The 2 lowest-paid employees' names.
+
 3.7  From `nums` sorted ascending, skip the first 3, return the rest.
+
 3.8  From `employees`, sort by dept ascending then salary descending, return names.
+
 3.9  The 3 largest numbers in `nums`, in descending order.
+
 3.10 Distinct first letters of all words, sorted.
 
 ---
@@ -217,16 +242,27 @@ Map<String, List<String>> stocksByClient = orders.stream()
 **Exercises**
 
 4.1  Group employees by department → `Map<String, List<Employee>>`.
+
 4.2  Count of employees per department → `Map<String, Long>`.
+
 4.3  Average salary per department → `Map<String, Double>`.
+
 4.4  Total quantity per client (from `orders`).
+
 4.5  Highest salary per department → `Map<String, Integer>` (use maxBy + collectingAndThen).
+
 4.6  Per client, a comma-joined string of their stocks → `Map<String, String>`.
+
 4.7  Per department, the list of employee *names* → `Map<String, List<String>>` (mapping).
+
 4.8  Partition employees into those earning ≥ 100000 vs below → `Map<Boolean, List<Employee>>`.
+
 4.9  Per client, the max single-order quantity → `Map<String, Integer>`.
+
 4.10 Count of orders per stock → `Map<String, Long>`.
+
 4.11 Per department, comma-joined names sorted alphabetically.
+
 4.12 Group words by their length → `Map<Integer, List<String>>`.
 
 ---
@@ -262,14 +298,23 @@ Setup for flatMap: `List<List<Integer>> matrix = List.of(List.of(1,2,3), List.of
 Setup: `List<String> sentences = List.of("the quick fox", "jumps over", "the lazy dog");`
 
 5.1  Flatten `matrix` into a single `List<Integer>`.
+
 5.2  Sum of all numbers in `matrix` (flatMap → mapToInt → sum, or flatMapToInt).
+
 5.3  From `sentences`, a list of all individual words (split on space, flatten).
+
 5.4  From `sentences`, count of distinct words.
+
 5.5  Build `Map<String, Integer>` from `employees`: name → salary (toMap).
+
 5.6  Build `Map<String, Double>` from `orders`: stock → price — handle duplicate keys by keeping the max price (toMap with merge).
+
 5.7  From `employees`, the longest word among all names, as Optional → orElse "none".
+
 5.8  From `orders`, all distinct stocks sorted, then joined with ", ".
+
 5.9  From `matrix`, only the even numbers, flattened and sorted.
+
 5.10 Build `Map<String, List<String>>` client → stocks using `toMap` with a merge that concatenates lists (contrast with groupingBy).
 
 ---
@@ -303,16 +348,27 @@ Map<String, IntSummaryStatistics> stats = employees.stream()
 **Exercises**
 
 6.1  Product of all numbers in `nums` using `reduce`.
+
 6.2  Concatenate all words into one string using `reduce` (identity "").
+
 6.3  Max of `nums` using `reduce` (returns Optional).
+
 6.4  Two-level group: employees by dept, then by "senior"/"junior" (age > 35).
+
 6.5  Salary `IntSummaryStatistics` per department (summarizingInt).
+
 6.6  Per department: a string like "Eng: 3 employees, avg 118333" (groupingBy + collectingAndThen on stats).
+
 6.7  From `orders`, total portfolio value per client (sum of quantity*price) → `Map<String, Double>`.
+
 6.8  Using `teeing`, compute for `nums` both the min and max, combined into an `int[]{min, max}` or a formatted string.
+
 6.9  Two-level group: orders by client, then total quantity per stock → `Map<String, Map<String, Integer>>`.
+
 6.10 The department with the highest average salary (group → average → max entry → key).
+
 6.11 Count employees per (dept, ageBucket) where ageBucket is decade (20s, 30s, 40s).
+
 6.12 From `orders`, the single most valuable order (max quantity*price), return a description string.
 
 ---
