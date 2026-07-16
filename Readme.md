@@ -126,13 +126,16 @@ Classic multithreading interview problems,each with a `problem.md` (problem stat
 - [Dining Philosophers](./code/multithreading/DiningPhilosophers/problem.md)
 - [Building H2O](./code/multithreading/BuildingH2O/problem.md)
 
-## Java Practice Problems
-Small self-contained Java files for practicing streams, OOP, and threading basics — [code/java/src/practice](code/java/src/streams-practice).
+
+## Java Streams Practice Problems
+Small self-contained Java files for practicing streams, OOP, and threading basics — [streams practice](code/java/src/streams-practice).
 
 - [Employee.java](code/java/src/streams-practice/Employee.java) — stream operations (filter, map, sort, group) over a list of employees.
 - [JavaStreamPractice.java](code/java/src/streams-practice/JavaStreamPractice.java) — a set of numbered stream tasks (filter/map/collect, sort + limit, map/reduce, etc.).
 - [Order.java](code/java/src/streams-practice/Order.java) — grouping/aggregating a list of orders by client and stock using streams.
 - [Test.java](code/java/src/streams-practice/Test.java) — stream basics: filter/map/collect, groupingBy, reduce vs mapToInt/sum, counting.
+
+> A progressive, six-level workbook (basic → advanced) for building Java Streams fluency through blank-page exercises — [streams workbook](./code/java/src/streams-practice/streams_workbook.md) ([answer key](./code/java/src/streams-practice/streams_workbook_answers.md)).
 
 ## Notations
 - Is-A (Inheritance)
