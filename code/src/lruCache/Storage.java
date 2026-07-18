@@ -19,6 +19,7 @@ public class Storage {
         }
         if(storage.size() == capacity) {
             int evictedKey = evictionEngine.EvictKey();
+            System.out.println("Evicting key: " + evictedKey);
             storage.remove(evictedKey);
         }
         storage.put(key, value);
